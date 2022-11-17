@@ -1,0 +1,4 @@
+[submodule "sfml"]
+	path = extlibs/sfml
+	url = git@github.com:sfml/sfml.git
+	branch = 2.6.x

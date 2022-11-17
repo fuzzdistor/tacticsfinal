@@ -1,0 +1,13 @@
+.cache/
+.idea/
+.vscode/
+.vs/
+[Bb]uild/
+[Cc]make-build*/
+[Ll]og.txt
+[Ll]og.old.txt
+[Nn]otes/
+[Rr]un.*
+compile_flags.txt
+compile_commands.json
+
