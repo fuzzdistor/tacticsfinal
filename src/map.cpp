@@ -25,7 +25,7 @@ size_t getMapIndex(const Map& map, unsigned int x, unsigned int y)
     return x + y * map.m_width;
 }
 
-Map::Map(char map[], uint width, uint height)
+Map::Map(const char map[], uint width, uint height)
     : m_map()
     , m_width(width)
     , m_height(height)
@@ -37,32 +37,30 @@ Map::Map(char map[], uint width, uint height)
     }
 }
 
-const std::vector<sf::Vector2u> Map::getRangeRadius(const sf::Vector2u center, unsigned int radius, Terrain mask) const
+const std::vector<sf::Vector2u> Map::getRangeArea(const sf::Vector2u center, unsigned int range, Terrain mask) const
 {
+    // center tiene que estar dentro del mapa como prerequisito. usar un center fuera del mapa resulta en undefined behaviour
     assert(center.x < m_width);
     assert(center.y < m_height);
 
-    if (radius == 0)
+    if (range == 0)
     {
-        if (getTerrain(center) == Map::Terrain::None)
-            return {};
+        if (masksMatch(getTerrain(center), mask))
+            return { center };
         else
-            return { sf::Vector2u(center.x, center.y) };
+            return {};
     }
 
-    DBG(center.x);
-    DBG(center.y);
+    std::vector<sf::Vector2u> range_v;
 
-    std::vector<sf::Vector2u> range;
-
-    for (uint y = center.y - radius; y <= std::min(center.y + radius, m_height - 1) || y >= -radius; y++)
+    for (uint y = center.y - range; y <= std::min(center.y + range, m_height - 1) || y >= -range; y++)
     {
         // si estoy haciendo underflow o me pase del alto del mapa no
         // me importa esta fila. continuo a la siguiente
         if (y >= m_height)
             continue;
 
-        for (uint x = center.x - radius; x <= center.x + radius || x >= -radius; x++)
+        for (uint x = center.x - range; x <= center.x + range || x >= -range; x++)
         {
             // si estoy haciendo underflow o me pase del ancho del mapa no
             // me importa esta columna. continuo a la siguiente
@@ -70,11 +68,50 @@ const std::vector<sf::Vector2u> Map::getRangeRadius(const sf::Vector2u center, u
                 continue;
 
             if (masksMatch(getTerrain(x,y), mask))
-                range.emplace_back(x,y);
+                range_v.emplace_back(x,y);
         }
     }
 
-    return range;
+    return range_v;
+}
+
+const std::vector<sf::Vector2u> Map::getRangeRadius(const sf::Vector2u center, unsigned int range, Terrain mask) const
+{
+    // center tiene que estar dentro del mapa como prerequisito. usar un center fuera del mapa resulta en undefined behaviour
+    assert(center.x < m_width);
+    assert(center.y < m_height);
+
+    if (range == 0)
+    {
+        if (masksMatch(getTerrain(center), mask))
+            return { center };
+        else
+            return {};
+    }
+
+    std::vector<sf::Vector2u> range_v;
+
+    for (uint y = center.y - range; y <= std::min(center.y + range, m_height - 1) || y >= -range; y++)
+    {
+        // si estoy haciendo underflow o me pase del alto del mapa no
+        // me importa esta fila. continuo a la siguiente
+        if (y >= m_height)
+            continue;
+
+        uint skip_tiles = y > center.y ? y - center.y : center.y - y;
+        for (uint x = center.x - range + skip_tiles; x <= center.x + range - skip_tiles || x >= -range; x++)
+        {
+            // si estoy haciendo underflow o me pase del ancho del mapa no
+            // me importa esta columna. continuo a la siguiente
+            if (x >= m_width)
+                continue;
+
+            if (masksMatch(getTerrain(x,y), mask))
+                range_v.emplace_back(x,y);
+        }
+    }
+
+    return range_v;
 }
 
 Map::Terrain Map::getTerrain(unsigned int x, unsigned int y) const

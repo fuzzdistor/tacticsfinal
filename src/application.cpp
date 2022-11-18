@@ -9,21 +9,25 @@
 #include <SFML/Window/Event.hpp>
 #include <iostream>
 #include <cassert>
-#include <span>
-#include <string_view>
 
-char m[] =
+constexpr char m[] =
     "wwww......." \
     "..x........" \
     "..xx......." \
     "..........." \
     "..........." \
-    "....--.....";
+    "....--....." \
+    "..........." \
+    "..........." \
+    "..........." \
+    ;
 
+constexpr uint mwidth = 11;
+constexpr uint mheight = 9;
 
 int main()
 {
-    Map map(m, 11, 6);
+    Map map(m, mwidth, mheight);
 
     sf::RenderWindow window({300, 300}, "SFML WORKS");
     const sf::Font font = [](){
@@ -34,26 +38,26 @@ int main()
 
     sf::Vector2u position = {3, 3};
 
-
     std::vector<sf::Text> t;
-    for (uint i = 0; i < 11 ; i++)
-        for (uint j = 0; j < 6 ; j++)
+    for (uint i = 0; i < mwidth ; i++)
+    {
+        for (uint j = 0; j < mheight ; j++)
         {
             t.emplace_back();
             t.back().setFont(font);
             t.back().setFillColor(sf::Color::White);
             t.back().setCharacterSize(20);
-            t.back().setPosition(sf::Vector2f(i*20u,j*20u));
+            t.back().setPosition(sf::Vector2f(sf::Vector2u(i*20u,j*20u)));
             if(masksMatch(map.getTerrain(i,j), Map::Terrain::Walkable))
                 t.back().setString("x");
         }
-
+    }
 
     std::vector<sf::Text> textvec;
 
     auto settextvec = [&](){
         textvec.clear();
-        auto vec = map.getRangeRadius(position, 3);
+        auto vec = map.getRangeRadius(position, 6);
         for (const auto& pos : vec)
         {
             textvec.emplace_back();
@@ -84,7 +88,7 @@ int main()
             {
                 if (event.key.code == sf::Keyboard::Escape)
                     window.close();
-                if (clock.getElapsedTime() > sf::seconds(0.3f))
+                if (clock.getElapsedTime() > sf::seconds(0.1f))
                 {
                     if (event.key.code == sf::Keyboard::W)
                     {

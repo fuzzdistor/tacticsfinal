@@ -22,11 +22,12 @@ public:
         Castable = Ground | Water | Obstacle,
     };
 
-    Map(char map[], uint width, uint height);
+    Map(const char map[], uint width, uint height);
 
     Terrain getTerrain(uint x, uint y) const;
     Terrain getTerrain(const sf::Vector2u& coord) const;
 
+    const std::vector<sf::Vector2u> getRangeArea(const sf::Vector2u center, uint radius, Terrain mask = Terrain::Walkable) const;
     const std::vector<sf::Vector2u> getRangeRadius(const sf::Vector2u center, uint radius, Terrain mask = Terrain::Walkable) const;
 
 private:
