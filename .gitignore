@@ -3,6 +3,7 @@
 .vscode/
 .vs/
 [Bb]uild/
+[Bb]uild*/
 [Cc]make-build*/
 [Ll]og.txt
 [Ll]og.old.txt
