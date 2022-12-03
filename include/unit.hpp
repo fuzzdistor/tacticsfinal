@@ -13,8 +13,8 @@
 
 enum Status
 {
-    Quick,
     Slow,
+    Haste,
 };
 
 class Unit : public sf::Drawable
@@ -32,6 +32,7 @@ public:
     Status getStatus() const;
     void setPosition(const sf::Vector2u& movement);
     void draw(sf::RenderTarget& target, sf::RenderStates state) const final;
+    constexpr const Stats& getStats() const;
 
 private:
 
@@ -41,6 +42,10 @@ private:
     Stats m_stats;
 };
 
+constexpr const Stats& Unit::getStats() const
+{
+    return m_stats;
+}
 constexpr uint Unit::getId() const
 {
     return m_id;

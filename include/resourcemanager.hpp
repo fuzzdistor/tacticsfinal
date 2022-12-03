@@ -52,14 +52,14 @@ struct ResourcePack
         return pack;
     }
 
-    ResourceManager<sf::Texture, std::string> textures;
-    ResourceManager<sf::Font, std::string> fonts;
+    ResourceManager<sf::Texture, size_t> textures;
+    ResourceManager<sf::Font, size_t> fonts;
 
 
 protected:
     // default protected constructor para evitar instanciar fuera del getInstance
-    // deleted copy constructors para evitar copias
     ResourcePack() = default;
+    // deleted copy constructors para evitar copias
     ResourcePack(const ResourcePack&) = delete;
     ResourcePack& operator=(const ResourcePack&) = delete;
 };

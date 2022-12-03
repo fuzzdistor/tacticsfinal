@@ -1,56 +1,67 @@
-#include "game.hpp"
-#include "SFML/Graphics/Rect.hpp"
-#include "SFML/Graphics/RectangleShape.hpp"
-#include "SFML/System/Vector2.hpp"
+#include "SFML/System/Time.hpp"
 #include "SFML/Window/Keyboard.hpp"
-#include "resourcemanager.hpp"
-#include "utils.hpp"
+#include "SFML/Window/WindowStyle.hpp"
 #include "battlescene.hpp"
+#include "game.hpp"
+#include "resourcemanager.hpp"
 #include <memory>
+
+#include "imgui.h"
+#include "imgui-SFML.h"
 
 Game::Game()
     : currentScene()
+    , m_frameTimer()
 {
     init();
     currentScene = std::make_unique<BattleScene>();
+    currentScene->setView(defaultView);
 }
 
 void Game::init()
 {
+    ImGui::SFML::Init(window);
     auto& pack = ResourcePack::getInstance();
-    pack.textures.load("Allied", "media/textures/unit1.png");
-    pack.textures.load("Enemy", "media/textures/unit2.png");
-    pack.textures.load("Cursor", "media/textures/cursor.png");
+    pack.textures.load(fd::hash("Allied"), "media/textures/unit1.png");
+    pack.textures.load(fd::hash("Enemy"), "media/textures/unit2.png");
+    pack.textures.load(fd::hash("Cursor"), "media/textures/cursor.png");
+}
+
+void Game::update()
+{
+    sf::Time frameTime = m_frameTimer.restart();
+    ImGui::SFML::Update(window, frameTime);
+    currentScene->update(frameTime);
 }
 
 void Game::run()
 {
+    m_frameTimer.restart();
     while(window.isOpen())
     {
         handleEvents();
+        update();
         draw();
     }
+    ImGui::SFML::Shutdown();
 }
 
 void Game::draw()
 {
     window.clear(sf::Color(BGCOLOR));
     window.setView(defaultView);
-    currentScene->draw(window);
+    currentScene->draw(window, sf::RenderStates());
+    ImGui::SFML::Render(window);
     window.display();
 }
 
 void Game::handleEvents()
 {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-    {
-        window.close();
-        return;
-    }
 
-    sf::Event event;
+    sf::Event event = sf::Event();
     while (window.pollEvent(event))
     {
+        ImGui::SFML::ProcessEvent(event);
         switch (event.type)
         {
             case sf::Event::Closed:
@@ -70,6 +81,20 @@ void Game::handleEvents()
                 break;
             case sf::Event::KeyPressed:
                 currentScene->onKeyPressed(event.key.code);
+                if (event.key.code == sf::Keyboard::Escape)
+                {
+                    window.close();
+                    return;
+                }
+                if (event.key.code == sf::Keyboard::F11)
+                {
+                    if (isFullscreen)
+                        window.create(VIDEOMODE, WINDOW_TITLE);
+                    else
+                        window.create(sf::VideoMode::getDesktopMode(), WINDOW_TITLE, sf::Style::Fullscreen);
+
+                    isFullscreen = !isFullscreen;
+                }
                 break;
             case sf::Event::LostFocus:
                 // TODO
@@ -78,10 +103,19 @@ void Game::handleEvents()
                 // TODO
                 break;
             case sf::Event::Resized:
-                // TODO
+                onWindowResized(event.size.width, event.size.height);
                 break;
             default: ;
         }
     }
+}
+
+void Game::onWindowResized(unsigned int width, unsigned int height)
+{
+    defaultView.setSize({static_cast<float>(width), static_cast<float>(height)});
+    auto view = defaultView;
+    view.zoom(0.125f);
+    view.setCenter(40, 40);
+    currentScene->setView(view);
 }
 

@@ -2,9 +2,7 @@
 #include "utils.hpp"
 #include "SFML/System/Vector2.hpp"
 #include <cassert>
-#include <fstream>
 #include <iostream>
-#include <string>
 #include <vector>
 
 #ifndef NDEBUG

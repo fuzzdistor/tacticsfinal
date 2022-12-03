@@ -3,7 +3,7 @@
 
 #include "unit.hpp"
 
-struct TurnUnit
+struct TurnProxyUnit
 {
     Unit* unit;
     uint counter;
@@ -15,29 +15,45 @@ class TurnManager
 public:
     TurnManager();
 
-    Unit* getTurn();
-    bool tick();
-    void advanceSpeed();
-    std::optional<Unit*> checkForQuick();
-    constexpr std::optional<Unit*> resolveTie(std::vector<Unit*> units);
+    /// @brief Avanza hasta que se resuelve quien es la siguiente unidad en
+    /// tomar un turno.
+    /// @return La unidad a la que le toca tomar el turno.
+    Unit* advanceToNextTurn();
 
 private:
+    constexpr void advanceOneTick();
+    std::optional<Unit*> getReadiedUnit();
+    std::optional<Unit*> resolveTie(std::vector<Unit*> units);
 
-    std::vector<TurnUnit> m_units;
+    /// @brief Determina si hay unidades que cumplen con la condición para
+    /// tomar un turno y maneja los puntajes de contador de manera acorde.
+    /// @return true si al menos una unidad cumple la condición para tomar un
+    /// turno, sino false.
+    void resolveReadyUnits();
+
+    std::vector<TurnProxyUnit> m_units;
 };
 
-constexpr std::optional<Unit*> TurnManager::resolveTie(std::vector<Unit*> units)
+constexpr void TurnManager::advanceOneTick()
 {
-    // lo más probable por mucho es que no haya elementos en units
-    [[likely]] if (units.empty())
-        return std::nullopt;
-    if (units.size() == 1)
-        return units.back();
+    for (auto& proxy : m_units)
+    {
+        switch(proxy.unit->getStatus())
+        {
+            case Status::Haste:
+                proxy.counter += proxy.unit->getStats().speed * 2u;
+                break;
+            case Status::Slow:
+                proxy.counter += proxy.unit->getStats().speed / 2u;
+                break;
+            default:
+                proxy.counter += proxy.unit->getStats().speed;
+        }
 
-    // retorno el elemento con menor valor de id
-    return *std::min_element(units.begin(), units.end(),
-            [](const Unit* lhs, const Unit* rhs)
-            { return lhs->getId() < rhs->getId(); });
+        proxy.counter += proxy.reserve;
+        proxy.reserve = 0;
+    }
 }
 
 #endif // TF_TURNMANAGER_HPP
+

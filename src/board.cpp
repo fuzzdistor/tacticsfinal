@@ -14,8 +14,8 @@ Board::Board(const MapData& data)
     , m_enemyTeam(6)
     , m_pathfinder(m_map)
 {
-    m_playerTeam.emplaceUnit(ResourcePack::getInstance().textures.get("Allied"));
-    auto& enemy = m_enemyTeam.emplaceUnit(ResourcePack::getInstance().textures.get("Enemy"));
+    m_playerTeam.emplaceUnit(ResourcePack::getInstance().textures.get(fd::hash("Allied")));
+    auto& enemy = m_enemyTeam.emplaceUnit(ResourcePack::getInstance().textures.get(fd::hash("Enemy")));
     m_playerTeam[0].setMovement(6);
     m_playerTeam[0].setPosition({5, 8});
     enemy.setMovement(6);
@@ -23,11 +23,11 @@ Board::Board(const MapData& data)
 
     auto& pack = ResourcePack::getInstance();
 
-    m_cursor.sprite.setTexture(pack.textures.get("Cursor"));
+    m_cursor.sprite.setTexture(pack.textures.get(fd::hash("Cursor")));
     m_cursor.shape.setFillColor(sf::Color(0xAAAA00AA));
 
-    pack.textures.load("Map1", data.imagepath);
-    m_sprite.setTexture(pack.textures.get("Map1"));
+    pack.textures.load(fd::hash("Map1"), data.imagepath);
+    m_sprite.setTexture(pack.textures.get(fd::hash("Map1")));
 
     updateHighlightedTiles();
 }

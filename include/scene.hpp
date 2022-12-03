@@ -11,7 +11,7 @@ class Scene
 {
 public:
     Scene() = default;
-    virtual ~Scene();
+    virtual ~Scene() = default;
 
     virtual void onMousePressed(sf::Mouse::Button button, const sf::Vector2f& position);
     virtual void onMouseReleased(sf::Mouse::Button button, const sf::Vector2f& position);
@@ -19,7 +19,17 @@ public:
     virtual void onKeyPressed(sf::Keyboard::Key key);
     virtual void onKeyReleased(sf::Keyboard::Key key);
     virtual void update(sf::Time dt);
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const = 0;
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
+
+    sf::View getView() const;
+    sf::View& getView();
+    void setView(const sf::View& view);
+
+protected:
+    friend void imguiWidget();
+
+private:
+    sf::View m_sceneView;
 };
 
 #endif //  TF_SCENE_HPP

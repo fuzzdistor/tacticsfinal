@@ -7,6 +7,7 @@
 #include <string_view>
 #include <tuple>
 #include <vector>
+
 #ifndef NDEBUG
 #include <source_location>
 #include <iostream>
@@ -24,27 +25,43 @@ using uint = unsigned int;
 ///////////////////////
 
 #ifndef NDEBUG
+
 #define TERM_WHITE "\033[38;2;255;255;255m"
 #define TERM_GREY "\033[38;2;99;104;109m"
 #define TERM_CYAN "\033[38;2;61;174;233m"
 #define TERM_YELLOW "\033[38;2;253;220;75m"
+#define TERM_ORANGE "\033[38;2;253;30;75m"
+#define TERM_GREEN "\033[38;2;30;253;75m"
 
-#define CONCAT(a,b) a ## b
-#define _LOGONCE_IMPL(var, id) static bool CONCAT(var, id) = true; if (CONCAT(var, id)) { D(var); CONCAT(var, id) = false; }
+#define CONCAT(a, b) a ## b
+
+#define _LOGONCE_IMPL(var, id) static bool CONCAT(var, id) = true;          \
+                if (CONCAT(var, id)) { D(var); CONCAT(var, id) = false; }
+
 #define _GETFLAGID __COUNTER__
 
-#define DBG(var) (std::cout << TERM_GREY << '[' << std::source_location::current().file_name() << ':' << std::source_location::current().line() << "] " << TERM_CYAN << (#var) << TERM_WHITE << " = " << TERM_YELLOW << (var) << TERM_WHITE << std::endl)
+#define DBG(var) (std::cout << TERM_GREY << '['                             \
+                  << std::source_location::current().file_name() << ':'     \
+                  << std::source_location::current().line() << "] "         \
+                  << TERM_CYAN << (#var) << TERM_WHITE << " = "             \
+                  << TERM_YELLOW << (var) << TERM_WHITE << std::endl)
+
 #define D(var) (std::cout << var << std::endl)
+
 #define DBGCOND(cond, var) if(cond) DBG(var)
+
 #define DBGONCE(var) { _LOGONCE_IMPL(var, _GETFLAGID) }
+
 #define TIMERINIT(var) auto var = std::chrono::high_resolution_clock::now()
+
 #define RESET_TIMER(var) var = std::chrono::high_resolution_clock::now()
-constexpr auto TimerMicroseconds(auto var)
-{
-    return std::chrono::duration_cast<std::chrono::microseconds>
-        (std::chrono::high_resolution_clock::now() - var).count();
-}
-#define DBGTIMER(var) DBG(TimerMicroseconds(var))
+
+#define IN_MICROSECONDS(var) \
+                    (std::chrono::duration_cast<std::chrono::microseconds>  \
+                    (std::chrono::high_resolution_clock::now() - var)       \
+                    .count())
+
+#define DBGTIMER(var) DBG(IN_MICROSECONDS(var))
 
 #else
 
@@ -55,6 +72,7 @@ constexpr auto TimerMicroseconds(auto var)
 #define TIMERINIT(var)
 #define RESET_TIMER(var)
 #define DBGTIMER(var)
+
 #endif // NDEBUG
 
 //////////////////////////////////////////
@@ -72,16 +90,7 @@ std::ostream& operator<<(std::ostream& os, const sf::Vector2<T>& vec)
 
 namespace fd
 {
-    // pequeño concepto para admitir cualquier tipo que pueda ser hasheado
-    template<typename T>
-    concept Hashable = requires(T h)
-    {
-        { std::hash<T>{}(h) } -> std::convertible_to<size_t>;
-    };
-
-    // hashing function. admite cualquier tipo que sea hasheable
-    template<Hashable T>
-    size_t hash(T t) { return std::hash<T>{}(t); }
+    constexpr auto hash = std::hash<std::string>{};
 }
 
 // Structured binding para separar x e y de un Vector2 en componentes individuales

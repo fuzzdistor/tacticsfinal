@@ -11,9 +11,11 @@ public:
     void onMouseMoved(sf::Vector2f movement) final;
     void onKeyPressed(sf::Keyboard::Key key) final;
     void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const final;
+    void update(sf::Time) override;
+protected:
+    friend void imguiWidget(BattleScene* scene);
 
 private:
     Board m_board;
-    mutable sf::View m_sceneView;
 };
 

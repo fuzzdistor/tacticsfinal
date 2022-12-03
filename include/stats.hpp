@@ -9,16 +9,16 @@ struct Stats
     uint level = 0;
     uint experiencePoints = 0;
 
-    float healthPoints = 0;
-    float maxHealthPoints = 0;
-    float magicPoints = 0;
-    float maxMagicPoints = 0;
+    uint healthPoints = 0;
+    uint maxHealthPoints = 0;
+    uint magicPoints = 0;
+    uint maxMagicPoints = 0;
 
-    float weaponAttack = 0;
-    float weaponDefense = 0;
-    float magicPower = 0;
-    float magicResistance = 0;
-    float speed = 0;
+    uint weaponAttack = 0;
+    uint weaponDefense = 0;
+    uint magicPower = 0;
+    uint magicResistance = 0;
+    uint speed = 0;
 };
 
 #endif // TF_STATS_HPP

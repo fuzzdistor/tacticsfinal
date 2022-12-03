@@ -1,11 +1,12 @@
 #include "battlescene.hpp"
 #include "SFML/System/Vector2.hpp"
 #include <algorithm>
+#include "imgui.h"
 
 void BattleScene::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 
-    target.setView(m_sceneView);
+    target.setView(getView());
     target.draw(m_board, states);
 }
 
@@ -19,7 +20,7 @@ void BattleScene::onMousePressed(sf::Mouse::Button button, const sf::Vector2f&)
 
 void BattleScene::onMouseMoved(sf::Vector2f movement)
 {
-    movement = m_sceneView.getTransform().transformPoint(movement);
+    movement = getView().getTransform().transformPoint(movement);
     movement.y = -movement.y;
     m_board.setCursorPosition(sf::Vector2u(movement));
 }
@@ -51,7 +52,26 @@ void BattleScene::onKeyPressed(sf::Keyboard::Key key)
 }
 
 BattleScene::BattleScene()
-    : m_board( m )
-    , m_sceneView({46, 32}, {100, 100})
+    : m_board(m)
 {
 }
+
+void BattleScene::update(sf::Time delta)
+{
+    imguiWidget(this);
+}
+
+void imguiWidget(BattleScene* scene)
+{
+    ImGui::ShowDemoWindow();
+    ImGui::Begin("BattleScene");
+    static int pos[2]; ImGui::InputInt2("Position", pos, ImGuiInputTextFlags_CharsDecimal);
+    if(ImGui::Button("Move to position"))
+        scene->m_board.moveCharacter({ static_cast<unsigned int>(pos[0]), static_cast<unsigned int>(pos[1]) });
+    static float viewcenter[2] = { scene->getView().getCenter().x, scene->getView().getCenter().y };
+    ImGui::SliderFloat2("View center", viewcenter, 0.f, 300.f);
+    scene->getView().setCenter(viewcenter[0], viewcenter[1]);
+    ImGui::Text("View center is %2.2f, %2.2f", scene->getView().getCenter().x, scene->getView().getCenter().y);
+    ImGui::End();
+}
+

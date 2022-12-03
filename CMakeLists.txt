@@ -17,6 +17,7 @@ string(TOUPPER ${CMAKE_BUILD_TYPE} BUILDTYPE)
 include_directories(
   "${CMAKE_SOURCE_DIR}/include"
   "${CMAKE_SOURCE_DIR}/extlibs/sfml/include"
+  SYSTEM "${CMAKE_SOURCE_DIR}/extlibs/ImGUI"
 )
 
 set(SFML_BUILD_GRAPHICS TRUE)
@@ -34,6 +35,7 @@ else()
 endif()
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/extlibs/sfml")
+add_subdirectory("${CMAKE_SOURCE_DIR}/extlibs/ImGUI")
 
 add_executable("${CMAKE_PROJECT_NAME}"
     src/application.cpp
@@ -55,7 +57,7 @@ add_executable("${CMAKE_PROJECT_NAME}"
     include/stats.hpp
     include/team.hpp
     include/resourcemanager.hpp
-    )
+        )
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options("${CMAKE_PROJECT_NAME}" PRIVATE
@@ -128,13 +130,13 @@ else ()
 endif()
 
 if(BUILDTYPE MATCHES RELEASE)
-    target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE ${SFML_LIBRARIES})
+    target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE ${SFML_LIBRARIES} imgui)
 endif()
 if(BUILDTYPE MATCHES DEBUG)
-    target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE ${SFML_DEBUG_LIBRARIES})
+    target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE ${SFML_DEBUG_LIBRARIES} imgui)
 endif()
 
 if(MSVC)
-    target_link_libraries(${PROJECT_NAME} PRIVATE sfml-main)
+    target_link_libraries(${PROJECT_NAME} PRIVATE sfml-main imgui)
 endif()
 

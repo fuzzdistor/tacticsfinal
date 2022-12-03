@@ -27,10 +27,14 @@ private:
     void init();
     void handleEvents();
     void draw();
+    void update();
+    void onWindowResized(unsigned int width, unsigned int height);
 
     std::unique_ptr<Scene> currentScene;
     sf::RenderWindow window { VIDEOMODE, WINDOW_TITLE };
     sf::View defaultView { window.getView() };
+    sf::Clock m_frameTimer;
+    bool isFullscreen { false };
 };
 
 #endif // TF_GAME_HPP

@@ -11,4 +11,5 @@
 [Rr]un.*
 compile_flags.txt
 compile_commands.json
+*.ini
 
