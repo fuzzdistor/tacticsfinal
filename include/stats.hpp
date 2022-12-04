@@ -19,6 +19,10 @@ struct Stats
     uint magicPower = 0;
     uint magicResistance = 0;
     uint speed = 0;
+
+    // esto le dice a la IA que tantas unidades de distancia hacen que empiece
+    // a tratar de atacar al enemigo
+    uint awareness = 0;
 };
 
 #endif // TF_STATS_HPP

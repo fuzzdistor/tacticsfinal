@@ -7,10 +7,14 @@
 #include "SFML/Graphics/RenderTarget.hpp"
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/Graphics/Text.hpp"
+#include "SFML/System/Time.hpp"
 #include "SFML/System/Vector2.hpp"
+#include "ai.hpp"
 #include "map.hpp"
+#include "terrain.hpp"
 #include "astar.hpp"
 #include "resourcemanager.hpp"
+#include "turnmanager.hpp"
 #include "team.hpp"
 #include "unit.hpp"
 
@@ -29,32 +33,36 @@ public:
     explicit Board(const MapData& data);
 
     template<typename T>
-    void setEntityPosition(T& entity, const sf::Vector2u& movement, Map::Terrain mask = Map::Terrain::Walkable);
+    void setEntityPosition(T& entity, const sf::Vector2u& movement, Terrain::Type mask = Terrain::Type::Walkable);
 
-    void moveCharacter(const sf::Vector2u& movement);
+    void moveCharacter(Unit& unit, const sf::Vector2u& position);
     void moveCursor(const sf::Vector2u& movement);
     void setCursorPosition(const sf::Vector2u& position);
 
     void accept();
     void cancel();
 
+    void update(sf::Time time);
+
 private:
+    friend class AI;
+
     void draw(sf::RenderTarget& target, sf::RenderStates states) const final;
     void updateHighlightedTiles();
     void updatePathRects(const std::vector<sf::Vector2u>& path);
 
-    void turnTick();
-
     Map m_map;
     sf::Sprite m_sprite {};
-    std::vector<sf::RectangleShape> m_tile_rects {};
-    std::vector<sf::RectangleShape> m_path_rects {};
-    uint m_tile_width {8};
-    uint m_tile_height {8};
+    std::vector<sf::RectangleShape> m_tileRects {};
+    std::vector<sf::RectangleShape> m_pathRects {};
+    uint m_tileWidth {8};
+    uint m_tileHeight {8};
     Team m_playerTeam;
     Team m_enemyTeam;
+    TurnManager m_turnManager;
     Cursor m_cursor {{3, 3}};
-    AStar m_pathfinder;
+    const Unit* m_currentTurn;
+    AI m_ai;
 };
 
 #endif // TF_BOARD_HPP

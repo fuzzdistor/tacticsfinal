@@ -3,11 +3,11 @@
 #include <algorithm>
 #include "imgui.h"
 
-void BattleScene::draw(sf::RenderTarget& target, sf::RenderStates states) const
-{
+void BattleScene::draw(sf::RenderTarget &target,
+                       sf::RenderStates states) const {
 
-    target.setView(getView());
-    target.draw(m_board, states);
+  target.setView(getView());
+  target.draw(m_board, states);
 }
 
 void BattleScene::onMousePressed(sf::Mouse::Button button, const sf::Vector2f&)
@@ -56,8 +56,9 @@ BattleScene::BattleScene()
 {
 }
 
-void BattleScene::update(sf::Time delta)
+void BattleScene::update(sf::Time dt)
 {
+    m_board.update(dt);
     imguiWidget(this);
 }
 
@@ -65,13 +66,10 @@ void imguiWidget(BattleScene* scene)
 {
     ImGui::ShowDemoWindow();
     ImGui::Begin("BattleScene");
-    static int pos[2]; ImGui::InputInt2("Position", pos, ImGuiInputTextFlags_CharsDecimal);
-    if(ImGui::Button("Move to position"))
-        scene->m_board.moveCharacter({ static_cast<unsigned int>(pos[0]), static_cast<unsigned int>(pos[1]) });
     static float viewcenter[2] = { scene->getView().getCenter().x, scene->getView().getCenter().y };
     ImGui::SliderFloat2("View center", viewcenter, 0.f, 300.f);
     scene->getView().setCenter(viewcenter[0], viewcenter[1]);
-    ImGui::Text("View center is %2.2f, %2.2f", scene->getView().getCenter().x, scene->getView().getCenter().y);
+    ImGui::Text("View center is %2.2f, %2.2f", static_cast<double>(scene->getView().getCenter().x), static_cast<double>(scene->getView().getCenter().y));
     ImGui::End();
 }
 

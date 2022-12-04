@@ -46,7 +46,7 @@ using uint = unsigned int;
                   << TERM_CYAN << (#var) << TERM_WHITE << " = "             \
                   << TERM_YELLOW << (var) << TERM_WHITE << std::endl)
 
-#define D(var) (std::cout << var << std::endl)
+#define D(var) (std::cout << var << TERM_WHITE << std::endl)
 
 #define DBGCOND(cond, var) if(cond) DBG(var)
 

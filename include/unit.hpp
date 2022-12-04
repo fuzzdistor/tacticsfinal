@@ -15,6 +15,7 @@ enum Status
 {
     Slow,
     Haste,
+    None,
 };
 
 class Unit : public sf::Drawable
@@ -28,6 +29,8 @@ public:
     constexpr uint getId() const;
     constexpr uint getMovement() const;
     constexpr void setMovement(uint movement);
+    constexpr void setAwareness(uint awareness);
+    constexpr void setSpeed(uint speed);
     sf::Vector2u getPosition() const;
     Status getStatus() const;
     void setPosition(const sf::Vector2u& movement);
@@ -40,6 +43,7 @@ private:
     sf::Vector2u m_position;
     sf::Sprite m_sprite;
     Stats m_stats;
+    Status m_status;
 };
 
 constexpr const Stats& Unit::getStats() const
@@ -59,6 +63,15 @@ constexpr uint Unit::getMovement() const
 constexpr void Unit::setMovement(uint movement)
 {
     m_stats.movement = movement;
+}
+constexpr void Unit::setAwareness(uint awareness)
+{
+    m_stats.awareness = awareness;
+}
+
+constexpr void Unit::setSpeed(uint speed)
+{
+    m_stats.speed = speed;
 }
 
 #endif // TF_UNIT_HPP

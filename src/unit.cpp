@@ -10,6 +10,7 @@ Unit::Unit(const sf::Texture& texture)
     , m_position()
     , m_sprite(texture)
     , m_stats()
+    , m_status(Status::None)
 {
 }
 
@@ -18,6 +19,12 @@ void Unit::draw(sf::RenderTarget& target, sf::RenderStates states) const
     states.transform.translate(sf::Vector2f(m_position * 8u));
     target.draw(m_sprite, states);
 }
+
+Status Unit::getStatus() const
+{
+    return m_status;
+}
+
 
 sf::Vector2u Unit::getPosition() const
 {

@@ -2,11 +2,14 @@
 #define TF_ASTAR_HPP
 
 #include "SFML/System/Vector2.hpp"
-#include "map.hpp"
 #include "utils.hpp"
+#include "terrain.hpp"
 #include <array>
 #include <algorithm>
 #include <optional>
+#include <variant>
+
+class Map;
 
 struct Node
 {
@@ -38,20 +41,28 @@ inline bool Node::operator==(const Node& other) const
 class AStar
 {
 public:
+    enum class PathType
+    {
+        Valid,
+        OutOfMap,
+        Unreachable,
+    };
+
+    typedef std::pair<PathType, std::vector<sf::Vector2u>> Path;
+
     explicit AStar(const Map& map);
 
-    auto getPath(const sf::Vector2u& start,
+    Path getPath(const sf::Vector2u& start,
                  const sf::Vector2u& goal,
                  uint movement,
-                 Map::Terrain mask = Map::Terrain::Walkable)
-                 -> std::optional<std::vector<sf::Vector2u>>;
+                 Terrain::Type mask = Terrain::Type::Walkable) const;
 
 private:
-    Node& getLowestFNode();
+    Node& getLowestFNode() const;
 
     const Map& m_map;
-    std::vector<Node> m_open{};
-    std::vector<Node> m_closed{};
+    mutable std::vector<Node> m_open{};
+    mutable std::vector<Node> m_closed{};
 };
 
 #endif // TF_ASTAR_HPP

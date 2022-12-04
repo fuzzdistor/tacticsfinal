@@ -19,6 +19,11 @@ public:
     // necesidad de hacer una copia ni un move
     constexpr Unit& emplaceUnit(UnitConstructor auto&& ... args);
 
+    inline size_t size() const;
+    inline auto begin() const;
+    inline auto begin();
+    inline auto end() const;
+    inline auto end();
     inline Unit& operator[](size_t index);
     inline const Unit& at(size_t index) const;
     inline Unit& at(size_t index);
@@ -27,6 +32,30 @@ private:
     std::vector<Unit> m_units;
 };
 
+inline auto Team::begin() const
+{
+    return m_units.begin();
+}
+
+inline auto Team::begin()
+{
+    return m_units.begin();
+}
+
+inline auto Team::end() const
+{
+    return m_units.end();
+}
+
+inline auto Team::end()
+{
+    return m_units.end();
+}
+
+inline size_t Team::size() const
+{
+    return m_units.size();
+}
 
 constexpr Unit& Team::emplaceUnit(UnitConstructor auto&& ... args)
 {

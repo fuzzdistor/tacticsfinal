@@ -39,6 +39,7 @@ add_subdirectory("${CMAKE_SOURCE_DIR}/extlibs/ImGUI")
 
 add_executable("${CMAKE_PROJECT_NAME}"
     src/application.cpp
+    src/ai.cpp
     src/astar.cpp
     src/battlescene.cpp
     src/board.cpp
@@ -46,7 +47,10 @@ add_executable("${CMAKE_PROJECT_NAME}"
     src/map.cpp
     src/scene.cpp
     src/team.cpp
+    src/turnmanager.cpp
     src/unit.cpp
+    src/xorshift.cpp
+    include/ai.hpp
     include/astar.hpp
     include/battlescene.hpp
     include/board.hpp
@@ -56,7 +60,9 @@ add_executable("${CMAKE_PROJECT_NAME}"
     include/scene.hpp
     include/stats.hpp
     include/team.hpp
+    include/turnmanager.hpp
     include/resourcemanager.hpp
+    include/xorshift.hpp
         )
 
 if(CMAKE_COMPILER_IS_GNUCXX)

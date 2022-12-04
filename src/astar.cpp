@@ -1,12 +1,14 @@
 #include "SFML/System/Sleep.hpp"
 #include "SFML/System/Time.hpp"
 #include "SFML/System/Vector2.hpp"
+#include "astar.hpp"
 #include "map.hpp"
 #include "utils.hpp"
-#include "astar.hpp"
+#include "terrain.hpp"
 #include <array>
 #include <chrono>
 #include <optional>
+#include <utility>
 
 Node::Node(const sf::Vector2u& coordinates)
     : coords(coordinates)
@@ -30,7 +32,7 @@ auto Node::getNeighbours(const Node& n) -> std::array<Node, 4>
 
 // pre-computo los máximos tamaños que va a tener el vector de closed y así
 // solo reservo la memoria necesaria.
-constexpr std::array<uint, 50> maxSizeByDistance = []()
+constexpr std::array<uint, 50> maxSizeByDistance = []
 {
     std::array<uint, 50> _dp;
     _dp[0] = 1;
@@ -44,21 +46,27 @@ AStar::AStar(const Map& map)
 {
 }
 
-auto AStar::getPath(
+AStar::Path AStar::getPath(
         sf::Vector2u const& start,
         sf::Vector2u const& goal,
         uint movement,
-        Map::Terrain mask
-        ) -> std::optional<std::vector<sf::Vector2u>>
+        Terrain::Type mask) const
 {
     if (!m_map.isCoordInbounds(start) || !m_map.isCoordInbounds(goal)
-            || !masksMatch(m_map.getTerrain(start), mask) || !masksMatch(m_map.getTerrain(goal), mask))
+            || !masksMatch(m_map.getTerrain(goal), mask))
     {
-        return std::nullopt;
+        return std::make_pair(PathType::OutOfMap, std::vector<sf::Vector2u>());
     }
 
+    // limpio los vectores
     m_open.clear();
     m_closed.clear();
+
+    // esta es una solución un poco sucia al problema de
+    // invalidación de punteros cuando se ejecuta un resize
+    // en el vector. para evitarlo simplemente reservo una cantidad
+    // de memoria igual a la cantidad máxima de nodos que pueden ser
+    // visitados de acuerdo al parametro de movement
     m_open.reserve(maxSizeByDistance.at(movement));
     m_closed.reserve(maxSizeByDistance.at(movement));
     m_open.emplace_back(start);
@@ -80,7 +88,7 @@ auto AStar::getPath(
                 path.push_back(it->coords);
                 it = it->parent;
             }
-            return path;
+            return std::make_pair(PathType::Valid, path);
         }
 
         auto neighbors = Node::getNeighbours(current);
@@ -116,10 +124,10 @@ auto AStar::getPath(
         }
     }
 
-    return std::nullopt;
+    return std::make_pair(PathType::Unreachable, std::vector<sf::Vector2u>());
 }
 
-Node& AStar::getLowestFNode()
+Node& AStar::getLowestFNode() const
 {
     std::sort(m_open.begin(), m_open.end(), [](const Node& rhs, const Node& lhs)
             { if (rhs.getFCost() == lhs.getFCost()) return rhs.h_cost > lhs.h_cost;
