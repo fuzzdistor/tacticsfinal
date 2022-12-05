@@ -41,6 +41,7 @@ add_executable("${CMAKE_PROJECT_NAME}"
     src/application.cpp
     src/ai.cpp
     src/astar.cpp
+    src/astarnode.cpp
     src/battlescene.cpp
     src/board.cpp
     src/game.cpp
@@ -54,6 +55,7 @@ add_executable("${CMAKE_PROJECT_NAME}"
     src/xorshift.cpp
     include/ai.hpp
     include/astar.hpp
+    include/astarnode.hpp
     include/battlescene.hpp
     include/board.hpp
     include/game.hpp
@@ -68,7 +70,7 @@ add_executable("${CMAKE_PROJECT_NAME}"
     include/tweener.hpp
     include/resourcemanager.hpp
     include/xorshift.hpp
-        )
+    )
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options("${CMAKE_PROJECT_NAME}" PRIVATE

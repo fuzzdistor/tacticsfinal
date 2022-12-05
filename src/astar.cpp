@@ -10,26 +10,6 @@
 #include <optional>
 #include <utility>
 
-Node::Node(const sf::Vector2u& coordinates)
-    : coords(coordinates)
-{
-}
-
-Node::Node(uint x, uint y)
-    : coords(x, y)
-{
-}
-
-auto Node::getNeighbours(const Node& n) -> std::array<Node, 4>
-{
-    return {
-        Node(n.coords.x    , n.coords.y - 1), // top
-        Node(n.coords.x - 1, n.coords.y    ), // left
-        Node(n.coords.x + 1, n.coords.y    ), // right
-        Node(n.coords.x    , n.coords.y + 1), // bottom
-    };
-}
-
 // pre-computo los máximos tamaños que va a tener el vector de closed y así
 // solo reservo la memoria necesaria.
 constexpr std::array<uint, 50> maxSizeByDistance = []
@@ -74,7 +54,7 @@ AStar::Path AStar::getPath(
     {
         m_closed.emplace_back(getLowestFNode());
         m_open.pop_back();
-        Node& current = m_closed.back();
+        AStarNode& current = m_closed.back();
 
         if (current.getFCost() > movement)
             continue;
@@ -91,7 +71,7 @@ AStar::Path AStar::getPath(
             return std::make_pair(PathType::Valid, path);
         }
 
-        auto neighbors = Node::getNeighbours(current);
+        auto neighbors = AStarNode::getNeighbours(current);
 
         for (auto& neighbour : neighbors)
         {
@@ -127,9 +107,9 @@ AStar::Path AStar::getPath(
     return std::make_pair(PathType::Unreachable, std::vector<sf::Vector2u>());
 }
 
-Node& AStar::getLowestFNode() const
+AStarNode& AStar::getLowestFNode() const
 {
-    std::sort(m_open.begin(), m_open.end(), [](const Node& rhs, const Node& lhs)
+    std::sort(m_open.begin(), m_open.end(), [](const AStarNode& rhs, const AStarNode& lhs)
             { if (rhs.getFCost() == lhs.getFCost()) return rhs.h_cost > lhs.h_cost;
             return rhs.getFCost() > lhs.getFCost(); });
     return m_open.back();
