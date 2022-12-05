@@ -31,7 +31,6 @@ public:
     [[nodiscard]] sf::Vector2u getSize() const;
 
     void setTerrain(const sf::Vector2u& coord, Terrain::Type terrain);
-    void setObject(const sf::Vector2u& coord, Terrain::Type terrain);
 
     [[nodiscard]] constexpr bool isCoordInbounds(const sf::Vector2u& coord) const;
 
@@ -47,7 +46,6 @@ private:
 #endif // NDEBUG
 
     std::vector<Terrain::Type> m_terrain_layer;
-    std::vector<Terrain::Type> m_objects_layer;
     uint m_width;
     uint m_height;
     AStar m_pathfinder;

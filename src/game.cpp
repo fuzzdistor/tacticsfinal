@@ -115,7 +115,7 @@ void Game::onWindowResized(unsigned int width, unsigned int height)
     defaultView.setSize({static_cast<float>(width), static_cast<float>(height)});
     auto view = defaultView;
     view.zoom(0.125f);
-    view.setCenter(40, 40);
+    view.setCenter(view.getSize()/3.f);
     currentScene->setView(view);
 }
 

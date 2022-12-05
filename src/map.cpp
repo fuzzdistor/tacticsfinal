@@ -23,7 +23,6 @@ Terrain::Type charToTerrain(char tile_char)
         case 'w': return Terrain::Type::Water;
         case 'x': return Terrain::Type::Obstacle;
         case '.': return Terrain::Type::Ground;
-        case 'u': return Terrain::Type::Unit;
         default: return Terrain::Type::None;
     }
 }
@@ -151,11 +150,6 @@ Terrain::Type Map::getTerrain(const sf::Vector2u& coord) const
 void Map::setTerrain(const sf::Vector2u &coord, Terrain::Type terrain)
 {
     m_terrain_layer.at(getCoordIndex(*this, coord)) = terrain;
-}
-
-void Map::setObject(const sf::Vector2u &coord, Terrain::Type object)
-{
-    m_objects_layer.at(getCoordIndex(*this, coord)) = object;
 }
 
 sf::Vector2u Map::getSize() const

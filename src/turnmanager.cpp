@@ -2,6 +2,7 @@
 #include "unit.hpp"
 #include "utils.hpp"
 #include <cassert>
+#include <imgui.h>
 #include <optional>
 
 TurnProxyUnit::TurnProxyUnit(const Unit* unit)
@@ -86,7 +87,7 @@ const Unit* TurnManager::getNextUnitAdvance()
         if (auto& maxCtElement = getHighestCtUnit(); maxCtElement.counter >= 1000)
         {
             D("Found one!");
-            D("maxCtElement.counter = " << maxCtElement.counter);
+            D(maxCtElement.m_unit->getName() << " takes its turn!");
             return maxCtElement.m_unit;
         }
 

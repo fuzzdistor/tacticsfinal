@@ -48,6 +48,7 @@ add_executable("${CMAKE_PROJECT_NAME}"
     src/scene.cpp
     src/team.cpp
     src/turnmanager.cpp
+    src/tweener.cpp
     src/unit.cpp
     src/xorshift.cpp
     include/ai.hpp
@@ -61,6 +62,8 @@ add_executable("${CMAKE_PROJECT_NAME}"
     include/stats.hpp
     include/team.hpp
     include/turnmanager.hpp
+    include/tween.hpp
+    include/tweener.hpp
     include/resourcemanager.hpp
     include/xorshift.hpp
         )

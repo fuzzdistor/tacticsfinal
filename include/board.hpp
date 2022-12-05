@@ -1,6 +1,5 @@
 #ifndef TF_BOARD_HPP
 #define TF_BOARD_HPP
-
 #include "SFML/Graphics/Drawable.hpp"
 #include "SFML/Graphics/RectangleShape.hpp"
 #include "SFML/Graphics/RenderStates.hpp"
@@ -16,9 +15,12 @@
 #include "resourcemanager.hpp"
 #include "turnmanager.hpp"
 #include "team.hpp"
+#include "tweener.hpp"
 #include "unit.hpp"
 
 using uint = unsigned int;
+
+class Scene;
 
 struct Cursor
 {
@@ -46,6 +48,7 @@ public:
 
 private:
     friend class AI;
+    friend void imguiWidget(Scene* scene);
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const final;
     void updateHighlightedTiles();
@@ -63,6 +66,7 @@ private:
     Cursor m_cursor {{3, 3}};
     const Unit* m_currentTurn;
     AI m_ai;
+    Tweener m_tweener;
 };
 
 #endif // TF_BOARD_HPP

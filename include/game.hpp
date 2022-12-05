@@ -14,7 +14,7 @@
 #define WINDOW_TITLE "Tactics Final"
 #endif
 
-#define VIDEOMODE sf::VideoMode(600, 600)
+#define VIDEOMODE sf::VideoMode(1280, 720)
 constexpr sf::Uint32 BGCOLOR = 0x37284fff;
 
 class Game

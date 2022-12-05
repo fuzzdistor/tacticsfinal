@@ -15,12 +15,15 @@ Board::Board(const MapData& data)
     , m_enemyTeam(6)
     , m_turnManager()
     , m_ai(*this)
+    , m_tweener()
 {
     m_playerTeam.emplaceUnit(ResourcePack::getInstance().textures.get(fd::hash("Allied")));
     auto& enemy = m_enemyTeam.emplaceUnit(ResourcePack::getInstance().textures.get(fd::hash("Enemy")));
+    m_playerTeam[0].setName("Marche");
     m_playerTeam[0].setMovement(6);
     m_playerTeam[0].setSpeed(150);
     m_playerTeam[0].setPosition({11, 8});
+    enemy.setName("Borzo");
     enemy.setMovement(6);
     enemy.setAwareness(10);
     enemy.setSpeed(130);
@@ -35,10 +38,16 @@ Board::Board(const MapData& data)
     m_sprite.setTexture(pack.textures.get(fd::hash("Map1")));
 
     for (const Unit& unit : m_playerTeam)
+    {
         m_turnManager.registerUnit(&unit);
+        m_map.setTerrain(unit.getPosition(), Terrain::Type::Unit);
+    }
 
     for (const Unit& unit : m_enemyTeam)
+    {
         m_turnManager.registerUnit(&unit);
+        m_map.setTerrain(unit.getPosition(), Terrain::Type::Unit);
+    }
 
     updateHighlightedTiles();
     m_currentTurn = m_turnManager.getNextUnitAdvance();
@@ -56,9 +65,9 @@ void Board::setEntityPosition(T& entity, const sf::Vector2u& position, Terrain::
     {
         D("Found Path!");
         // muevo la unidad a la posición de goal
-        /* m_map.setTerrain(entity.getPosition(), Terrain::Type::Ground); */
+        m_map.setTerrain(entity.getPosition(), Terrain::Type::Ground);
         entity.setPosition(path.second.front());
-        /* m_map.setTerrain(entity.getPosition(), Terrain::Type::Unit); */
+        m_map.setTerrain(entity.getPosition(), Terrain::Type::Unit);
 
         updatePathRects(path.second);
         updateHighlightedTiles();
@@ -149,10 +158,14 @@ void Board::accept()
                 [&](const Unit& unit) { return &unit == m_currentTurn; });
             it != m_playerTeam.end())
     {
-        D(TERM_ORANGE << "PLAYER TAKES TURN!");
-        moveCharacter(m_playerTeam.at(0), m_cursor.position);
-        m_turnManager.takeCtFromUnit(&m_playerTeam.at(0), TurnManager::ActionTaken::Moved);
-        m_currentTurn = m_turnManager.getNextUnitAdvance();
+        if (auto path = m_map.getPath(m_playerTeam.at(0).getPosition(), m_cursor.position, m_playerTeam.at(0).getMovement());
+                path.first == AStar::PathType::Valid)
+        {
+            D(TERM_ORANGE << "PLAYER TAKES TURN!");
+            moveCharacter(m_playerTeam.at(0), m_cursor.position);
+            m_turnManager.takeCtFromUnit(&m_playerTeam.at(0), TurnManager::ActionTaken::Moved);
+            m_currentTurn = m_turnManager.getNextUnitAdvance();
+        }
     }
 }
 

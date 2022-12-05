@@ -62,9 +62,14 @@ void BattleScene::update(sf::Time dt)
     imguiWidget(this);
 }
 
-void imguiWidget(BattleScene* scene)
+void imguiWidget(Scene* scene)
 {
-    ImGui::ShowDemoWindow();
+    auto battlescene = static_cast<BattleScene*>(scene);
+    // ImGui::ShowDemoWindow();
+    ImGui::Begin("TurnManager");
+    auto highestCtUnit = battlescene->m_board.m_turnManager.getHighestCtUnit();
+    ImGui::Text("MaxCounter: %d", highestCtUnit.m_unit);
+    ImGui::End();
     ImGui::Begin("BattleScene");
     static float viewcenter[2] = { scene->getView().getCenter().x, scene->getView().getCenter().y };
     ImGui::SliderFloat2("View center", viewcenter, 0.f, 300.f);

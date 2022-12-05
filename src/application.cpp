@@ -6,15 +6,9 @@
 int main()
 {
     TIMERINIT(ApplicationTimer);
-    Game game;
-    try
-    {
-        game.run();
-    }
 
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
+    Game game;
+    game.run();
+
     DBGTIMER(ApplicationTimer);
 }

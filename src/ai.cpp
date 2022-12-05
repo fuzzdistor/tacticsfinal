@@ -27,19 +27,18 @@ void AI::takeTurn(Unit& unit)
             { return path.first == AStar::PathType::Valid; });
     if (it != paths.end())
     {
+        assert(it->second.size() >= 2 && "In AI: The target position and unit position are overlapping");
         // la distancia a recorrer va a ser la minima entre la capacidad
         // de movimiento de la unidad y la cantidad de distancia real
         // entre la unidad y la celda adyacente a su ojetivo mas cercana
         uint distance = std::min(static_cast<uint>(it->second.size() - 1)
                 , unit.getStats().movement);
 
-        /* DBG(distance); */
-
-        /* DBG(unit.getPosition()); */
-        /* DBG(it->second.at(1)); */
-
-        m_board.moveCharacter(unit
-                , it->second.at(it->second.size() - distance));
+        m_board.moveCharacter(unit , it->second.at(it->second.size() - distance));
         m_board.m_turnManager.takeCtFromUnit(&unit, TurnManager::ActionTaken::Moved);
+    }
+    else
+    {
+        m_board.m_turnManager.takeCtFromUnit(&unit, TurnManager::ActionTaken::None);
     }
 }

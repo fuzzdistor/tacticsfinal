@@ -13,7 +13,7 @@ public:
     void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const final;
     void update(sf::Time) override;
 protected:
-    friend void imguiWidget(BattleScene* scene);
+    friend void imguiWidget(Scene* scene);
 
 private:
     Board m_board;
