@@ -46,6 +46,7 @@ private:
     sf::Vector2u m_coords;
     sf::Vector2f m_position;
     sf::Sprite m_sprite;
+    Tween<sf::Vector2f> m_tween;
     Stats m_stats;
     Status m_status;
     uint m_id;

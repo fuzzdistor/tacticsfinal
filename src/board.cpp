@@ -132,6 +132,7 @@ void Board::update(sf::Time dt)
         m_ai.takeTurn(*it);
         m_currentTurn = m_turnManager.getNextUnitAdvance();
     }
+
     m_tweener.update(dt);
 }
 
