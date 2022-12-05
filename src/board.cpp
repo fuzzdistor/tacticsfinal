@@ -15,7 +15,7 @@ Board::Board(const MapData& data)
     , m_enemyTeam(6)
     , m_turnManager()
     , m_ai(*this)
-    , m_tweener()
+    , m_tweener(Tweener::getInstance())
 {
     m_playerTeam.emplaceUnit(ResourcePack::getInstance().textures.get(fd::hash("Allied")));
     auto& enemy = m_enemyTeam.emplaceUnit(ResourcePack::getInstance().textures.get(fd::hash("Enemy")));
@@ -122,7 +122,7 @@ void Board::updateHighlightedTiles()
     }
 }
 
-void Board::update(sf::Time)
+void Board::update(sf::Time dt)
 {
     if (auto it = std::find_if(m_enemyTeam.begin(), m_enemyTeam.end(),
                 [&](const Unit& unit) { return &unit == m_currentTurn; });
@@ -132,6 +132,7 @@ void Board::update(sf::Time)
         m_ai.takeTurn(*it);
         m_currentTurn = m_turnManager.getNextUnitAdvance();
     }
+    m_tweener.update(dt);
 }
 
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const

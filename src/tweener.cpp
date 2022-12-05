@@ -1,44 +1,42 @@
 #include "tweener.hpp"
 #include <cassert>
 
+void Tweener::createTween(TweenFunction&& tweenFunction)
+{
+    m_tweenableFunctions.emplace_back(m_uniqueId, std::forward<TweenFunction>(tweenFunction));
+}
+
 void Tweener::update(sf::Time dt)
 {
     std::vector<size_t> finishedTweens;
 
-    for (auto& twc : m_floattweens)
+    for (auto& element : m_tweenableFunctions)
     {
-        if(twc->tween.update(dt))
-            finishedTweens.push_back(twc->id);
-    }
-
-    for (auto& twc : m_uinttweens)
-    {
-        if(twc->tween.update(dt))
-            finishedTweens.push_back(twc->id);
+        if (element.second(dt))
+            finishedTweens.push_back(element.first);
     }
 
     clearFinishedTweens(finishedTweens);
+}
+
+Tweener& Tweener::getInstance()
+{
+    static Tweener instance;
+    return instance;
 }
 
 void Tweener::clearFinishedTweens(const std::vector<size_t>& finishedTweens)
 {
     for (size_t id : finishedTweens)
     {
-        {
-        auto it = std::remove_if(m_floattweens.begin(), m_floattweens.end(), [&]
-                (const auto& tween) { return tween->id == id; });
+        auto it = std::find_if(
+                m_tweenableFunctions.begin()
+                , m_tweenableFunctions.end()
+                , [&] (const auto& tween)
+                { return tween.first == id; });
 
-        if (it != m_floattweens.end())
-            m_floattweens.erase(it);
-        }
-
-        {
-        auto it = std::find_if(m_uinttweens.begin(), m_uinttweens.end(), [&]
-                (const auto& tween) { return tween->id == id; });
-
-        if (it != m_uinttweens.end())
-            m_uinttweens.erase(it);
-        }
+        assert(it != m_tweenableFunctions.end());
+        m_tweenableFunctions.erase(it);
     }
 }
 

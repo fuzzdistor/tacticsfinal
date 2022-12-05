@@ -66,7 +66,7 @@ private:
     Cursor m_cursor {{3, 3}};
     const Unit* m_currentTurn;
     AI m_ai;
-    Tweener m_tweener;
+    Tweener& m_tweener;
 };
 
 #endif // TF_BOARD_HPP

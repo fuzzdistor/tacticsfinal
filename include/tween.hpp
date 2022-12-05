@@ -15,7 +15,7 @@ template <Tweenable T>
 class Tween
 {
 public:
-    Tween(T& propierty, T start, T end, sf::Time time);
+    Tween(T* propierty, T start, T end, sf::Time time);
     Tween(const Tween<T>&) = delete;
     Tween(Tween<T>&&) = delete;
 
@@ -27,11 +27,11 @@ private:
     sf::Time m_t;
     T m_start;
     T m_end;
-    T& m_propierty;
+    T* m_propierty;
 };
 
 template<Tweenable T>
-Tween<T>::Tween(T& propierty, T start, T end, sf::Time time)
+Tween<T>::Tween(T* propierty, T start, T end, sf::Time time)
     : m_time(time)
     , m_t(sf::Time::Zero)
     , m_start(start)
@@ -51,7 +51,7 @@ template<Tweenable T>
 bool Tween<T>::update(sf::Time dt)
 {
     m_t += dt;
-    m_propierty = std::lerp(m_start, m_end, m_t / m_time);
+    *m_propierty = std::lerp(m_start, m_end, m_t / m_time);
     return m_t >= m_time;
 }
 
