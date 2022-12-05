@@ -47,6 +47,7 @@ add_executable("${CMAKE_PROJECT_NAME}"
     src/map.cpp
     src/scene.cpp
     src/team.cpp
+    src/tilemarkers.cpp
     src/turnmanager.cpp
     src/tweener.cpp
     src/unit.cpp
@@ -61,6 +62,7 @@ add_executable("${CMAKE_PROJECT_NAME}"
     include/scene.hpp
     include/stats.hpp
     include/team.hpp
+    include/tilemarkers.hpp
     include/turnmanager.hpp
     include/tween.hpp
     include/tweener.hpp

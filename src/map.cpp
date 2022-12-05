@@ -83,7 +83,7 @@ std::vector<sf::Vector2u> Map::getRangeArea(const sf::Vector2u& center, unsigned
             if (x >= m_width)
                 continue;
 
-            if (masksMatch(getTerrain(x,y), mask))
+            if (m_pathfinder.getPath(center, {x, y}, range, mask).first == AStar::PathType::Valid)
                 range_v.emplace_back(x,y);
         }
     }
@@ -98,10 +98,11 @@ AStar::Path Map::getPath(const sf::Vector2u& start, const sf::Vector2u& goal, ui
 
 std::vector<sf::Vector2u> Map::getRangeRadius(const sf::Vector2u& center, unsigned int range, Terrain::Type mask) const
 {
-    // center tiene que estar dentro del mapa como prerequisito. usar un center fuera del mapa resulta en undefined behaviour
+    // center tiene que estar dentro del mapa como prerequisito.
     assert(center.x < m_width);
     assert(center.y < m_height);
 
+    // resultado rapido para los dos casos de rango 0
     if (range == 0)
     {
         if (masksMatch(getTerrain(center), mask))
@@ -129,7 +130,7 @@ std::vector<sf::Vector2u> Map::getRangeRadius(const sf::Vector2u& center, unsign
             if (x >= m_width)
                 continue;
 
-            if (masksMatch(getTerrain(x,y), mask))
+            if (m_pathfinder.getPath(center, {x, y}, range, mask).first == AStar::PathType::Valid)
                 range_v.emplace_back(x,y);
         }
     }

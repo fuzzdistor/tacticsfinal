@@ -13,6 +13,7 @@
 #include "terrain.hpp"
 #include "astar.hpp"
 #include "resourcemanager.hpp"
+#include "tilemarkers.hpp"
 #include "turnmanager.hpp"
 #include "team.hpp"
 #include "tweener.hpp"
@@ -51,13 +52,10 @@ private:
     friend void imguiWidget(Scene* scene);
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const final;
-    void updateHighlightedTiles();
-    void updatePathRects(const std::vector<sf::Vector2u>& path);
 
     Map m_map;
+    TileMarkers m_tileMarkers;
     sf::Sprite m_sprite {};
-    std::vector<sf::RectangleShape> m_tileRects {};
-    std::vector<sf::RectangleShape> m_pathRects {};
     uint m_tileWidth {8};
     uint m_tileHeight {8};
     Team m_playerTeam;
