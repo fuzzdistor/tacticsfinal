@@ -1,8 +1,10 @@
 #include "map.hpp"
 #include "terrain.hpp"
+#include "unit.hpp"
 #include "utils.hpp"
 #include "SFML/System/Vector2.hpp"
 #include <cassert>
+#include <imgui.h>
 #include <iostream>
 #include <vector>
 
@@ -156,5 +158,16 @@ void Map::setTerrain(const sf::Vector2u &coord, Terrain::Type terrain)
 sf::Vector2u Map::getSize() const
 {
     return {m_width, m_height};
+}
+
+void Map::updateTerrainFaction(const std::vector<Unit>& units, uint faction)
+{
+    for (auto& unit : units)
+    {
+        if (unit.getFaction() == faction)
+            setTerrain(unit.getCoordinates(), Terrain::Type::AlliedUnit);
+        else
+            setTerrain(unit.getCoordinates(), Terrain::Type::EnemyUnit);
+    }
 }
 

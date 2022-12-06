@@ -2,6 +2,7 @@
 #include "SFML/System/Vector2.hpp"
 #include <algorithm>
 #include "imgui.h"
+#include "tweener.hpp"
 
 void BattleScene::draw(sf::RenderTarget &target,
                        sf::RenderStates states) const {
@@ -53,12 +54,14 @@ void BattleScene::onKeyPressed(sf::Keyboard::Key key)
 
 BattleScene::BattleScene()
     : m_board(m)
+    , m_tweener(Tweener::getInstance())
 {
 }
 
 void BattleScene::update(sf::Time dt)
 {
     m_board.update(dt);
+    m_tweener.update(dt);
     imguiWidget(this);
 }
 
@@ -68,7 +71,6 @@ void imguiWidget(Scene* scene)
     // ImGui::ShowDemoWindow();
     ImGui::Begin("TurnManager");
     auto highestCtUnit = battlescene->m_board.m_turnManager.getHighestCtUnit();
-    ImGui::Text("MaxCounter: %d", highestCtUnit.m_unit);
     ImGui::End();
     ImGui::Begin("BattleScene");
     static float viewcenter[2] = { scene->getView().getCenter().x, scene->getView().getCenter().y };

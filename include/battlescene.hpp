@@ -17,5 +17,6 @@ protected:
 
 private:
     Board m_board;
+    Tweener& m_tweener;
 };
 

@@ -11,10 +11,13 @@
 
 using uint = unsigned int;
 
+class Unit;
+
 struct MapData
 {
     uint width;
     uint height;
+    uint units;
     const char* map_string;
     const char* imagepath;
 };
@@ -31,6 +34,7 @@ public:
     [[nodiscard]] sf::Vector2u getSize() const;
 
     void setTerrain(const sf::Vector2u& coord, Terrain::Type terrain);
+    void updateTerrainFaction(const std::vector<Unit>& units, uint faction);
 
     [[nodiscard]] constexpr bool isCoordInbounds(const sf::Vector2u& coord) const;
 

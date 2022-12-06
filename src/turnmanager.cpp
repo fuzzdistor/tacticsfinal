@@ -25,14 +25,7 @@ void TurnProxyUnit::advanceCounter()
         default:
             counter += m_unit->getStats().speed;
     }
-
-    D("---Advancing counter");
-    D("counter: " << counter);
-    D("reserve: " << reserve);
-
     counter += reserve;
-    D("new counter: " << counter);
-
     if (counter >= 1000)
         notifyReadyUnit(this);
 
@@ -42,6 +35,7 @@ void TurnProxyUnit::advanceCounter()
 void TurnManager::registerUnit(const Unit* unit)
 {
     m_units.emplace_back(unit);
+    D("Registered unit " << unit->getName());
     m_units.back().notifyReadyUnit =
         [&](const TurnProxyUnit* turn){
             D("Notifying Ready Unit!");
@@ -82,16 +76,11 @@ const Unit* TurnManager::getNextUnitAdvance()
 {
     while (true)
     {
-        D("Looping unit advance");
-
         if (auto& maxCtElement = getHighestCtUnit(); maxCtElement.counter >= 1000)
         {
-            D("Found one!");
             D(maxCtElement.m_unit->getName() << " takes its turn!");
             return maxCtElement.m_unit;
         }
-
-        D("Did not found one, ticking!");
         m_readyUnits.clear();
         advanceOneTick();
 
@@ -116,10 +105,10 @@ void TurnManager::computeUnitsTurnVariables()
     }
 }
 
-void TurnManager::takeCtFromUnit(const Unit* unit, ActionTaken action)
+void TurnManager::takeCtFromUnit(const Unit& unit, ActionTaken action)
 {
     auto it = std::find_if(m_units.begin(), m_units.end(),
-            [&](const auto& unitProxy){ return unitProxy.m_unit == unit; });
+            [&](const auto& unitProxy){ return unitProxy.m_unit == &unit; });
 
     assert(it != m_units.end());
     assert(it->counter == 1000);

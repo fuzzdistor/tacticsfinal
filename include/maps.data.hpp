@@ -4,7 +4,7 @@
 #include "map.hpp"
 
 constexpr MapData m = {
-    12, 9,
+    12, 9, 12,
     "wwww........" \
     "..x........." \
     "..xx........" \

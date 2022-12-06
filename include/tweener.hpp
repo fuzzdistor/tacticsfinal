@@ -21,7 +21,7 @@ private:
     Tweener();
     void clearFinishedTweens(const std::vector<size_t>& finishedTweens);
 
-    std::vector<std::pair<size_t, TweenFunction>> m_tweenableFunctions;
+    std::vector<std::pair<size_t, TweenFunction>> m_tweens;
     size_t m_uniqueId;
 };
 

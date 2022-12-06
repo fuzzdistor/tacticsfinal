@@ -37,7 +37,7 @@ public:
     [[nodiscard]] const Unit* getNextUnitAdvance();
     [[nodiscard]] TurnProxyUnit& getHighestCtUnit();
 
-    void takeCtFromUnit(const Unit* unit, ActionTaken action);
+    void takeCtFromUnit(const Unit& unit, ActionTaken action);
 
 private:
     void advanceOneTick();

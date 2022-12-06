@@ -21,7 +21,7 @@ struct Stats
     uint speed = 0;
 
     // esto le dice a la IA que tantas unidades de distancia hacen que empiece
-    // a tratar de atacar al enemigo
+    // a tratar de acercarse al enemigo
     uint awareness = 0;
 };
 

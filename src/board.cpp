@@ -5,6 +5,7 @@
 #include "map.hpp"
 #include "resourcemanager.hpp"
 #include "terrain.hpp"
+#include "units.data.hpp"
 #include "turnmanager.hpp"
 #include "utils.hpp"
 #include <chrono>
@@ -12,71 +13,79 @@
 
 Board::Board(const MapData& data)
     : m_map(data)
-    , m_playerTeam(6)
-    , m_enemyTeam(6)
+    , m_tileMarkers()
+    , m_units()
     , m_turnManager()
     , m_ai(*this)
     , m_tweener(Tweener::getInstance())
 {
-    m_playerTeam.emplaceUnit(ResourcePack::getInstance().textures.get(fd::hash("Allied")));
-    auto& enemy = m_enemyTeam.emplaceUnit(ResourcePack::getInstance().textures.get(fd::hash("Enemy")));
-    m_playerTeam[0].setName("Marche");
-    m_playerTeam[0].setMovement(6);
-    m_playerTeam[0].setSpeed(150);
-    m_playerTeam[0].setPosition({11, 8});
-    enemy.setName("Borzo");
-    enemy.setMovement(6);
-    enemy.setAwareness(10);
-    enemy.setSpeed(130);
-    enemy.setPosition({3, 3});
+    constexpr int units = 4;
+    m_units.reserve(units);
+    {
+        std::array<sf::Vector2u, units> coordinates = {sf::Vector2u(11, 8), sf::Vector2u(10, 8), sf::Vector2u(3, 3), sf::Vector2u(3, 4)};
+        for (size_t i = 0; i < data_names.size(); i++)
+        {
+            auto hash = data_playercontrolled[i]? fd::hash("Allied") : fd::hash("Enemy");
+            auto faction = data_playercontrolled[i]? 1u : 2u;
+            auto& unit = m_units.emplace_back(
+                    ResourcePack::getInstance().textures.get(hash)
+                    , data_names[i]
+                    , data_stats[i]
+                    );
+            unit.setCoordinates(coordinates[i]);
+            unit.setPlayerControlled(data_playercontrolled[i]);
+            unit.setFaction(faction);
+        }
+    }
 
     auto& pack = ResourcePack::getInstance();
-
-    m_cursor.sprite.setTexture(pack.textures.get(fd::hash("Cursor")));
-    m_cursor.shape.setFillColor(sf::Color(0xAAAA00AA));
 
     pack.textures.load(fd::hash("Map1"), data.imagepath);
     m_sprite.setTexture(pack.textures.get(fd::hash("Map1")));
 
-    for (const Unit& unit : m_playerTeam)
+    for (const Unit& unit : m_units)
     {
         m_turnManager.registerUnit(&unit);
-        m_map.setTerrain(unit.getPosition(), Terrain::Type::Unit);
+        m_map.setTerrain(unit.getCoordinates(), Terrain::Type::Unit);
     }
 
-    for (const Unit& unit : m_enemyTeam)
-    {
-        m_turnManager.registerUnit(&unit);
-        m_map.setTerrain(unit.getPosition(), Terrain::Type::Unit);
-    }
-
-    m_tileMarkers.updateHighlightedTiles(
-            m_map.getRangeRadius(m_playerTeam.at(0).getPosition(), m_playerTeam.at(0).getMovement()));
     m_currentTurn = m_turnManager.getNextUnitAdvance();
+    m_tileMarkers.updateHighlightedTiles(
+            m_map.getRangeRadius(m_currentTurn->getCoordinates(), m_currentTurn->getStats().movement));
+    m_cursor.setCoordinates(m_currentTurn->getCoordinates());
 }
 
 template<typename T>
 void Board::setEntityPosition(T& entity, const sf::Vector2u& position, Terrain::Type mask)
 {
-    /* DBG(entity.getPosition()); */
-    /* DBG(position); */
-    /* DBG(entity.getMovement()); */
-    /* DBG(static_cast<uint>(mask)); */
     // recibo un Path. si el path es valido lo recorro, sino nada.
-    if (auto path = m_map.getPath(entity.getPosition(), position, entity.getMovement(), mask); path.first == AStar::PathType::Valid)
+    D("attempting to move");
+    if (auto path = m_map.getPath(entity.getCoordinates(), position, entity.getStats().movement, mask); path.first == AStar::PathType::Valid)
     {
+        D("attempt successful");
         // muevo la unidad a la posición de goal
-        m_map.setTerrain(entity.getPosition(), Terrain::Type::Ground);
-        entity.setPosition(path.second.front());
-        m_map.setTerrain(entity.getPosition(), Terrain::Type::Unit);
+        m_map.setTerrain(entity.getCoordinates(), Terrain::Type::Ground);
+        m_map.setTerrain(path.second.front(), Terrain::Type::Unit);
 
+        entity.tweenPath(path.second);
+        //entity.tweenPosition(path.second.front());
         m_tileMarkers.updatePathMarkers(path.second);
-        m_tileMarkers.updateHighlightedTiles(
-                m_map.getRangeRadius(
-                    m_currentTurn->getPosition()
-                    , m_currentTurn->getMovement()
-                    , Terrain::Type::Walkable));
     }
+    else
+        D("attempt failed for some reason");
+}
+
+void Board::advanceTurn()
+{
+    auto it = std::find_if(
+            m_units.begin()
+            , m_units.end()
+            , [&](const Unit& unit) { return &unit == m_currentTurn; });
+    m_turnManager.takeCtFromUnit(*it, TurnManager::ActionTaken::Moved);
+    m_currentTurn = m_turnManager.getNextUnitAdvance();
+    m_map.updateTerrainFaction(m_units, m_currentTurn->getFaction());
+    updateTileMarkers();
+    m_cursor.tweenPosition(m_currentTurn->getCoordinates());
 }
 
 void Board::moveCharacter(Unit& unit, const sf::Vector2u& position)
@@ -84,59 +93,62 @@ void Board::moveCharacter(Unit& unit, const sf::Vector2u& position)
     setEntityPosition(unit, position);
 }
 
-void Board::moveCursor(const sf::Vector2u& movement)
+void Board::updateTileMarkers()
 {
-    m_cursor.position += movement;
+    m_tileMarkers.updateTargetTile(m_currentTurn->getCoordinates());
+    m_tileMarkers.updateHighlightedTiles(
+            m_map.getRangeRadius(
+                m_currentTurn->getCoordinates()
+                , m_currentTurn->getStats().movement
+                , Terrain::Type::Walkable));
 }
 
-void Board::setCursorPosition(const sf::Vector2u& position)
+void Board::update(sf::Time)
 {
-    m_cursor.position = position;
-}
-
-
-void Board::update(sf::Time dt)
-{
-    if (auto it = std::find_if(m_enemyTeam.begin(), m_enemyTeam.end(),
-                [&](const Unit& unit) { return &unit == m_currentTurn; });
-                it != m_enemyTeam.end())
+    if (!m_currentTurn->isPlayerControlled())
     {
-        D(TERM_CYAN << "ENEMY TAKES TURN!");
-        m_ai.takeTurn(*it);
-        m_currentTurn = m_turnManager.getNextUnitAdvance();
-    }
+        auto it = std::find_if(
+                m_units.begin()
+                , m_units.end()
+                , [&](const Unit& unit) { return &unit == m_currentTurn; });
 
-    m_tweener.update(dt);
+        m_ai.takeTurn(*it);
+    }
 }
 
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     target.draw(m_sprite, states);
     m_tileMarkers.draw(target, states);
-    m_playerTeam.at(0).draw(target, states);
-    m_enemyTeam.at(0).draw(target, states);
+    for (auto& unit : m_units)
+        unit.draw(target, states);
 
-    // TODO cursor
-    states = sf::RenderStates();
-    states.transform.translate(sf::Vector2f(m_cursor.position*8u));
-    target.draw(m_cursor.shape, states);
-    states.transform.translate(sf::Vector2f(0, -7.f));
-    target.draw(m_cursor.sprite, states);
+    m_cursor.draw(target, states);
+}
+
+void Board::setCursorPosition(const sf::Vector2u& position)
+{
+    m_cursor.setCoordinates(position);
+}
+
+void Board::moveCursor(const sf::Vector2u& movement)
+{
+    m_cursor.tweenPosition(m_cursor.getCoordinates() + movement);
 }
 
 void Board::accept()
 {
-    if (auto it = std::find_if(m_playerTeam.begin(), m_playerTeam.end(),
-                [&](const Unit& unit) { return &unit == m_currentTurn; });
-            it != m_playerTeam.end())
+    if (m_currentTurn->isPlayerControlled())
     {
-        if (auto path = m_map.getPath(m_playerTeam.at(0).getPosition(), m_cursor.position, m_playerTeam.at(0).getMovement());
+        if (auto path = m_map.getPath(m_currentTurn->getCoordinates(), m_cursor.getCoordinates(), m_currentTurn->getStats().movement);
                 path.first == AStar::PathType::Valid)
         {
-            D(TERM_ORANGE << "PLAYER TAKES TURN!");
-            moveCharacter(m_playerTeam.at(0), m_cursor.position);
-            m_turnManager.takeCtFromUnit(&m_playerTeam.at(0), TurnManager::ActionTaken::Moved);
-            m_currentTurn = m_turnManager.getNextUnitAdvance();
+            auto it = std::find_if(
+                    m_units.begin()
+                    , m_units.end()
+                    , [&](const Unit& unit) { return &unit == m_currentTurn; });
+            moveCharacter(*it, m_cursor.getCoordinates());
+            advanceTurn();
         }
     }
 }

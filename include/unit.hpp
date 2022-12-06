@@ -12,7 +12,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
-enum Status
+enum class Status
 {
     Slow,
     Haste,
@@ -22,23 +22,38 @@ enum Status
 class Unit : public sf::Drawable
 {
 public:
+    enum class State
+    {
+        Waiting,
+        Moving,
+        Moved,
+        Acted,
+    };
+
     Unit() = delete;
+    // TODO  evitar que sean copiables
 
     explicit Unit(const sf::Texture& texture);
+    Unit(const sf::Texture& texture, const std::string& name, const Stats& stats);
 
     void setTexture(const sf::Texture& texture);
     constexpr uint getId() const;
-    constexpr uint getMovement() const;
     constexpr void setMovement(uint movement);
     constexpr void setAwareness(uint awareness);
+    constexpr void setFaction(uint faction);
+    constexpr uint getFaction() const;
     constexpr void setSpeed(uint speed);
     const std::string& getName() const;
-    sf::Vector2u getPosition() const;
+    sf::Vector2u getCoordinates() const;
     Status getStatus() const;
-    void setPosition(const sf::Vector2u& movement);
+    constexpr const Stats& getStats() const;
+    constexpr bool isPlayerControlled() const;
+    constexpr void setPlayerControlled(bool state);
+    void setCoordinates(const sf::Vector2u& position);
     void setName(const std::string& name);
     void draw(sf::RenderTarget& target, sf::RenderStates state) const final;
-    constexpr const Stats& getStats() const;
+    void tweenPosition(const sf::Vector2u& position);
+    void tweenPath(std::vector<sf::Vector2u>& path);
 
 private:
 
@@ -46,30 +61,29 @@ private:
     sf::Vector2u m_coords;
     sf::Vector2f m_position;
     sf::Sprite m_sprite;
-    Tween<sf::Vector2f> m_tween;
     Stats m_stats;
     Status m_status;
     uint m_id;
+    uint m_faction;
+    bool m_playerControlled;
+    State m_state;
 };
 
 constexpr const Stats& Unit::getStats() const
 {
     return m_stats;
 }
+
 constexpr uint Unit::getId() const
 {
     return m_id;
-}
-
-constexpr uint Unit::getMovement() const
-{
-    return m_stats.movement;
 }
 
 constexpr void Unit::setMovement(uint movement)
 {
     m_stats.movement = movement;
 }
+
 constexpr void Unit::setAwareness(uint awareness)
 {
     m_stats.awareness = awareness;
@@ -78,6 +92,25 @@ constexpr void Unit::setAwareness(uint awareness)
 constexpr void Unit::setSpeed(uint speed)
 {
     m_stats.speed = speed;
+}
+constexpr bool Unit::isPlayerControlled() const
+{
+    return m_playerControlled;
+}
+
+constexpr void Unit::setPlayerControlled(bool state)
+{
+    m_playerControlled = state;
+}
+
+constexpr void Unit::setFaction(uint faction)
+{
+    m_faction = faction;
+}
+
+constexpr uint Unit::getFaction() const
+{
+    return m_faction;
 }
 
 #endif // TF_UNIT_HPP

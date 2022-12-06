@@ -32,10 +32,19 @@ AStar::Path AStar::getPath(
         uint movement,
         Terrain::Type mask) const
 {
-    if (!m_map.isCoordInbounds(start) || !m_map.isCoordInbounds(goal)
-            || !masksMatch(m_map.getTerrain(goal), mask))
+    if (!m_map.isCoordInbounds(start) || !m_map.isCoordInbounds(goal))
     {
         return std::make_pair(PathType::OutOfMap, std::vector<sf::Vector2u>());
+    }
+
+    if (mask == Terrain::Type::Walkable)
+    {
+        if (!masksMatch(m_map.getTerrain(goal), Terrain::Type::Standable))
+            return std::make_pair(PathType::Invalid, std::vector<sf::Vector2u>());
+    }
+    else if (!masksMatch(m_map.getTerrain(goal), mask))
+    {
+        return std::make_pair(PathType::Invalid, std::vector<sf::Vector2u>());
     }
 
     // limpio los vectores

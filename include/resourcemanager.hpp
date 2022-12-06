@@ -1,18 +1,14 @@
 #ifndef TF_RESOURCEMANAGER_HPP
 #define TF_RESOURCEMANAGER_HPP
 
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <map>
 #include <string>
 #include <memory>
 #include <stdexcept>
 #include <cassert>
 #include <utility>
-
-namespace sf
-{
-    class Texture;
-    class Font;
-}
 
 template <typename Resource, typename Identifier>
 class ResourceManager

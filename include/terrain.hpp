@@ -5,16 +5,18 @@ using uint = unsigned int;
 
 namespace Terrain
 {
-
     enum class [[nodiscard]] Type : uint
     {
         Ground = 1 << 0,
         Water = 1 << 1,
         None = 1 << 2,
         Obstacle = 1 << 3,
-        Unit = 1 << 4,
+        AlliedUnit = 1 << 4,
+        EnemyUnit = 1 << 5,
 
-        Walkable = Ground | Water | None,
+        Unit = AlliedUnit | EnemyUnit,
+        Walkable = Ground | Water | AlliedUnit | None,
+        Standable = Ground | Water | None,
         Castable = Ground | Water | Unit | None,
         All = 0xFFFFFFFF,
     };

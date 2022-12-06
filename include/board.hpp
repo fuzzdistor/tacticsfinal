@@ -9,6 +9,7 @@
 #include "SFML/System/Time.hpp"
 #include "SFML/System/Vector2.hpp"
 #include "ai.hpp"
+#include "cursor.hpp"
 #include "map.hpp"
 #include "terrain.hpp"
 #include "astar.hpp"
@@ -23,24 +24,19 @@ using uint = unsigned int;
 
 class Scene;
 
-struct Cursor
-{
-    sf::Vector2u position{};
-    sf::Sprite sprite{};
-    sf::RectangleShape shape{{8, 8}};
-};
-
 class Board : public sf::Drawable
 {
 public:
+    Board() = delete;
     explicit Board(const MapData& data);
 
     template<typename T>
     void setEntityPosition(T& entity, const sf::Vector2u& movement, Terrain::Type mask = Terrain::Type::Walkable);
 
     void moveCharacter(Unit& unit, const sf::Vector2u& position);
-    void moveCursor(const sf::Vector2u& movement);
     void setCursorPosition(const sf::Vector2u& position);
+    void moveCursor(const sf::Vector2u& movement);
+    void advanceTurn();
 
     void accept();
     void cancel();
@@ -52,19 +48,19 @@ private:
     friend void imguiWidget(Scene* scene);
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const final;
+    void updateTileMarkers();
 
     Map m_map;
+    sf::Sprite m_sprite;
     TileMarkers m_tileMarkers;
-    sf::Sprite m_sprite {};
-    uint m_tileWidth {8};
-    uint m_tileHeight {8};
-    Team m_playerTeam;
-    Team m_enemyTeam;
+    std::vector<Unit> m_units;
     TurnManager m_turnManager;
-    Cursor m_cursor {{3, 3}};
     const Unit* m_currentTurn;
+    Cursor m_cursor;
     AI m_ai;
     Tweener& m_tweener;
+    uint m_tileWidth {8};
+    uint m_tileHeight {8};
 };
 
 #endif // TF_BOARD_HPP
