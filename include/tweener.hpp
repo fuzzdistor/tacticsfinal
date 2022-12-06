@@ -16,6 +16,7 @@ public:
     static Tweener& getInstance();
     void createTween(TweenFunction&& tweenFunction);
     void update(sf::Time dt);
+    bool isActive() const;
 
 private:
     Tweener();

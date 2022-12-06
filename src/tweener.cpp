@@ -34,6 +34,11 @@ Tweener& Tweener::getInstance()
     return instance;
 }
 
+bool Tweener::isActive() const
+{
+    return !m_tweens.empty();
+}
+
 void Tweener::clearFinishedTweens(const std::vector<size_t>& finishedTweens)
 {
     for (size_t id : finishedTweens)

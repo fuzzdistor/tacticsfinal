@@ -5,84 +5,45 @@
 #include <array>
 #include <string>
 
-const std::array<std::string, 4> data_names
+constexpr size_t data_units = 8;
+
+const std::array<std::string, data_units> data_names
 {
     "Marche",
     "Montblanc",
+    "Reze",
+    "Mila",
     "Borzo",
     "Villo",
+    "Drago",
+    "Fafnir",
 };
 
-const std::array<bool, 4> data_playercontrolled
+const std::array<bool, data_units> data_playercontrolled
 {
     true,
     true,
+    true,
+    true,
+    false,
+    false,
     false,
     false
 };
 
-const std::array<Stats, 4> data_stats
+const std::array<Stats, data_units> data_stats
 {
-    {{
-    5, // movement
-    0, // level
-    0, // experiencePoints
-    50, // healthPoints
-    50, // maxHealthPoints
-    20, // magicPoints
-    20, // maxMagicPoints
-    10, // weaponAttack
-    0, // weaponDefense
-    10, // magicPower
-    10, // magicResistance
-    150, // speed
-    10, // awareness
-    },
     {
-    5, // movement
-    0, // level
-    0, // experiencePoints
-    50, // healthPoints
-    50, // maxHealthPoints
-    20, // magicPoints
-    20, // maxMagicPoints
-    10, // weaponAttack
-    0, // weaponDefense
-    10, // magicPower
-    10, // magicResistance
-    145, // speed
-    10, // awareness
+        //  mov lvl exp HP  mHP MP  mMP wpnAtk  wpnDef  magPow  magRes  spd  awareness
+        {   4,  4,  0,  50, 50, 20, 20, 10,     0,      10,     10,     150, 8, },
+        {   4,  4,  0,  50, 50, 20, 20, 10,     0,      10,     10,     145, 8, },
+        {   4,  4,  0,  50, 50, 20, 20, 10,     0,      10,     10,     150, 8, },
+        {   4,  4,  0,  50, 50, 20, 20, 10,     0,      10,     10,     145, 8, },
+        {   4,  3,  0,  40, 40, 10, 10, 4,      0,      10,     10,     146, 8, },
+        {   4,  3,  0,  40, 40, 10, 10, 4,      0,      10,     10,     130, 8, },
+        {   4,  3,  0,  40, 40, 10, 10, 4,      0,      10,     10,     146, 8, },
+        {   4,  3,  0,  40, 40, 10, 10, 4,      0,      10,     10,     130, 8, },
     },
-    {
-    5, // movement
-    0, // level
-    0, // experiencePoints
-    40, // healthPoints
-    40, // maxHealthPoints
-    10, // magicPoints
-    10, // maxMagicPoints
-    4, // weaponAttack
-    0, // weaponDefense
-    10, // magicPower
-    10, // magicResistance
-    130, // speed
-    10, // awareness
-    },
-    {
-    5, // movement
-    0, // level
-    0, // experiencePoints
-    40, // healthPoints
-    40, // maxHealthPoints
-    10, // magicPoints
-    10, // maxMagicPoints
-    4, // weaponAttack
-    0, // weaponDefense
-    10, // magicPower
-    10, // magicResistance
-    130, // speed
-    10, // awareness
-    }},
 };
 
 

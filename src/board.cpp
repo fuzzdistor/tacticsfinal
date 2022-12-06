@@ -9,6 +9,7 @@
 #include "turnmanager.hpp"
 #include "utils.hpp"
 #include <chrono>
+#include <imgui.h>
 #include <vector>
 
 Board::Board(const MapData& data)
@@ -19,11 +20,20 @@ Board::Board(const MapData& data)
     , m_ai(*this)
     , m_tweener(Tweener::getInstance())
 {
-    constexpr int units = 4;
-    m_units.reserve(units);
+    m_units.reserve(data.units);
     {
-        std::array<sf::Vector2u, units> coordinates = {sf::Vector2u(11, 8), sf::Vector2u(10, 8), sf::Vector2u(3, 3), sf::Vector2u(3, 4)};
-        for (size_t i = 0; i < data_names.size(); i++)
+        std::array<sf::Vector2u, data_units> coordinates =
+        {
+            sf::Vector2u(11, 8),
+            sf::Vector2u(10, 8),
+            sf::Vector2u(9, 8),
+            sf::Vector2u(8, 8),
+            sf::Vector2u(3, 0),
+            sf::Vector2u(2, 0),
+            sf::Vector2u(1, 0),
+            sf::Vector2u(0, 0),
+        };
+        for (size_t i = 0; i < data_units; i++)
         {
             auto hash = data_playercontrolled[i]? fd::hash("Allied") : fd::hash("Enemy");
             auto faction = data_playercontrolled[i]? 1u : 2u;
@@ -50,8 +60,7 @@ Board::Board(const MapData& data)
     }
 
     m_currentTurn = m_turnManager.getNextUnitAdvance();
-    m_tileMarkers.updateHighlightedTiles(
-            m_map.getRangeRadius(m_currentTurn->getCoordinates(), m_currentTurn->getStats().movement));
+    m_tileMarkers.updateHighlightedTiles(m_map.getRangeRadius(m_currentTurn->getCoordinates(), m_currentTurn->getStats().movement));
     m_cursor.setCoordinates(m_currentTurn->getCoordinates());
 }
 
@@ -86,6 +95,8 @@ void Board::advanceTurn()
     m_map.updateTerrainFaction(m_units, m_currentTurn->getFaction());
     updateTileMarkers();
     m_cursor.tweenPosition(m_currentTurn->getCoordinates());
+    m_tweener.createTween([t = sf::Time::Zero](sf::Time dt) mutable
+            { t+=dt; return t > sf::seconds(1.f); });
 }
 
 void Board::moveCharacter(Unit& unit, const sf::Vector2u& position)
@@ -105,7 +116,7 @@ void Board::updateTileMarkers()
 
 void Board::update(sf::Time)
 {
-    if (!m_currentTurn->isPlayerControlled())
+    if (!m_tweener.isActive() && !m_currentTurn->isPlayerControlled())
     {
         auto it = std::find_if(
                 m_units.begin()
@@ -114,6 +125,14 @@ void Board::update(sf::Time)
 
         m_ai.takeTurn(*it);
     }
+
+    Stats s = m_currentTurn->getStats();
+    ImGui::Begin("Current Turn");
+    ImGui::Text("Unit: %s", m_currentTurn->getName().c_str());
+    ImGui::Text("HP: %d/%d", s.healthPoints, s.maxHealthPoints);
+    ImGui::Text("MP: %d/%d", s.magicPoints, s.maxMagicPoints);
+    ImGui::Text("Lvl/Exp: %d/%d", s.level, s.experiencePoints);
+    ImGui::End();
 }
 
 void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -138,7 +157,7 @@ void Board::moveCursor(const sf::Vector2u& movement)
 
 void Board::accept()
 {
-    if (m_currentTurn->isPlayerControlled())
+    if (!m_tweener.isActive() && m_currentTurn->isPlayerControlled())
     {
         if (auto path = m_map.getPath(m_currentTurn->getCoordinates(), m_cursor.getCoordinates(), m_currentTurn->getStats().movement);
                 path.first == AStar::PathType::Valid)

@@ -60,9 +60,6 @@ void AI::takeTurn(Unit& unit)
     }
     else
     {
-        D("Contents of path:");
-        for (auto& position : it->second)
-            D("position: " << position);
         D(unit.getName() << " did not find a unit to approach");
         D(unit.getName() << " stays in place");
         m_board.advanceTurn();
