@@ -3,6 +3,8 @@
 
 #include <functional>
 
+using uint = unsigned int;
+
 class Unit;
 
 struct TurnProxyUnit

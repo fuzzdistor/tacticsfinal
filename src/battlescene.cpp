@@ -5,10 +5,11 @@
 #include "tweener.hpp"
 
 void BattleScene::draw(sf::RenderTarget &target,
-                       sf::RenderStates states) const {
-
-  target.setView(getView());
-  target.draw(m_board, states);
+                       sf::RenderStates states) const 
+{
+    states.transform.scale({ 8.f, 8.f });
+    target.setView(getView());
+    target.draw(m_board, states);
 }
 
 void BattleScene::onMousePressed(sf::Mouse::Button button, const sf::Vector2f&)
@@ -77,6 +78,7 @@ void imguiWidget(Scene* scene)
     ImGui::SliderFloat2("View center", viewcenter, 0.f, 300.f);
     scene->getView().setCenter(viewcenter[0], viewcenter[1]);
     ImGui::Text("View center is %2.2f, %2.2f", static_cast<double>(scene->getView().getCenter().x), static_cast<double>(scene->getView().getCenter().y));
+    ImGui::Text("View size is %2.2f, %2.2f", static_cast<double>(scene->getView().getSize().x), static_cast<double>(scene->getView().getSize().y));
     ImGui::End();
 }
 
