@@ -14,8 +14,7 @@ Game::Game()
     , m_frameTimer()
 {
     init();
-    currentScene = std::make_unique<BattleScene>();
-    currentScene->setView(defaultView);
+    resetScene();
 }
 
 void Game::init()
@@ -26,6 +25,8 @@ void Game::init()
     pack.textures.load(fd::hash("Allied"), "media/textures/unit1.png");
     pack.textures.load(fd::hash("Enemy"), "media/textures/unit2.png");
     pack.textures.load(fd::hash("Cursor"), "media/textures/cursor.png");
+    pack.fonts.load(fd::hash("Default"), "media/fonts/default.ttf");
+    defaultView = window.getView();
 }
 
 void Game::update()
@@ -33,6 +34,11 @@ void Game::update()
     sf::Time frameTime = m_frameTimer.restart();
     ImGui::SFML::Update(window, frameTime);
     currentScene->update(frameTime);
+}
+
+void Game::resetScene()
+{
+    currentScene = std::make_unique<BattleScene>();
 }
 
 void Game::run()

@@ -29,10 +29,11 @@ private:
     void draw();
     void update();
     void onWindowResized(unsigned int width, unsigned int height);
+    void resetScene();
 
     std::unique_ptr<Scene> currentScene;
     sf::RenderWindow window { VIDEOMODE, WINDOW_TITLE };
-    sf::View defaultView { window.getView() };
+    sf::View defaultView;
     sf::Clock m_frameTimer;
     bool isFullscreen { false };
 };

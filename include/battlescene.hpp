@@ -1,3 +1,4 @@
+#include "SFML/Graphics/RectangleShape.hpp"
 #include "SFML/Graphics/View.hpp"
 #include "scene.hpp"
 #include "board.hpp"
@@ -12,11 +13,14 @@ public:
     void onKeyPressed(sf::Keyboard::Key key) final;
     void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const final;
     void update(sf::Time) override;
+
 protected:
     friend void imguiWidget(Scene* scene);
 
 private:
     Board m_board;
+    sf::RectangleShape m_screen;
+    sf::Text m_startText;
     Tweener& m_tweener;
 };
 
