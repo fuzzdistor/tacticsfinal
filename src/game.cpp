@@ -20,6 +20,7 @@ Game::Game()
 
 void Game::init()
 {
+    window.setFramerateLimit(60);
     ImGui::SFML::Init(window);
     auto& pack = ResourcePack::getInstance();
     pack.textures.load(fd::hash("Allied"), "media/textures/unit1.png");
@@ -97,10 +98,14 @@ void Game::handleEvents()
                 }
                 break;
             case sf::Event::LostFocus:
-                // TODO
+                {
+                    window.setFramerateLimit(10);
+                }
                 break;
             case sf::Event::GainedFocus:
-                // TODO
+                {
+                    window.setFramerateLimit(60);
+                }
                 break;
             case sf::Event::Resized:
                 onWindowResized(event.size.width, event.size.height);
@@ -113,9 +118,7 @@ void Game::handleEvents()
 void Game::onWindowResized(unsigned int width, unsigned int height)
 {
     defaultView.setSize({static_cast<float>(width), static_cast<float>(height)});
-    auto view = defaultView;
-    view.zoom(0.125f);
-    view.setCenter(view.getSize()/3.f);
-    currentScene->setView(view);
+    defaultView.setCenter(defaultView.getSize()/3.f);
+    currentScene->setView(defaultView);
 }
 

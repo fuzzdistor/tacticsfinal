@@ -132,6 +132,11 @@ void Board::update(sf::Time)
     ImGui::Text("HP: %d/%d", s.healthPoints, s.maxHealthPoints);
     ImGui::Text("MP: %d/%d", s.magicPoints, s.maxMagicPoints);
     ImGui::Text("Lvl/Exp: %d/%d", s.level, s.experiencePoints);
+    ImGui::BeginChild("ASD");
+    if (ImGui::Button("LABEL", ImVec2(100, 20)))
+    {
+    }
+    ImGui::EndChild();
     ImGui::End();
 }
 
@@ -147,11 +152,18 @@ void Board::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
 void Board::setCursorPosition(const sf::Vector2u& position)
 {
+    if (position.x > m_map.getSize().x || position.y > m_map.getSize().y)
+        return;
     m_cursor.setCoordinates(position);
 }
 
 void Board::moveCursor(const sf::Vector2u& movement)
 {
+    if (!m_currentTurn->isPlayerControlled())
+        return;
+    auto position = m_cursor.getCoordinates() + movement;
+    if (position.x > m_map.getSize().x - 1 || position.y > m_map.getSize().y - 1)
+        return;
     m_cursor.tweenPosition(m_cursor.getCoordinates() + movement);
 }
 

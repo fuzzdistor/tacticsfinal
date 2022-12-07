@@ -5,7 +5,7 @@
 #include "tweener.hpp"
 
 void BattleScene::draw(sf::RenderTarget &target,
-                       sf::RenderStates states) const 
+                       sf::RenderStates states) const
 {
     states.transform.scale({ 8.f, 8.f });
     target.setView(getView());

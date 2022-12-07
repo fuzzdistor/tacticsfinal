@@ -42,7 +42,7 @@ void Cursor::tweenPosition(const sf::Vector2u& position)
             {
                 tween.update(dt);
                 return !tween.isActive();
-            });
+            }, false);
     m_tileHighlight.setPosition(sf::Vector2f(m_coords * 8u));
 }
 

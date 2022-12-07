@@ -14,7 +14,7 @@ class Tweener
 public:
     typedef std::function<bool(sf::Time)> TweenFunction;
     static Tweener& getInstance();
-    void createTween(TweenFunction&& tweenFunction);
+    void createTween(TweenFunction&& tweenFunction, bool isBlocking = true);
     void update(sf::Time dt);
     bool isActive() const;
 
@@ -23,6 +23,7 @@ private:
     void clearFinishedTweens(const std::vector<size_t>& finishedTweens);
 
     std::vector<std::pair<size_t, TweenFunction>> m_tweens;
+    std::vector<size_t> m_blockingTweenIds;
     size_t m_uniqueId;
 };
 

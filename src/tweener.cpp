@@ -7,9 +7,13 @@ Tweener::Tweener()
 {
 }
 
-void Tweener::createTween(TweenFunction&& tweenFunction)
+void Tweener::createTween(TweenFunction&& tweenFunction, bool isBlocking)
 {
     m_tweens.emplace_back(m_uniqueId, std::forward<TweenFunction>(tweenFunction));
+
+    if (isBlocking)
+        m_blockingTweenIds.push_back(m_uniqueId);
+
     m_uniqueId++;
 }
 
@@ -36,7 +40,7 @@ Tweener& Tweener::getInstance()
 
 bool Tweener::isActive() const
 {
-    return !m_tweens.empty();
+    return !m_blockingTweenIds.empty();
 }
 
 void Tweener::clearFinishedTweens(const std::vector<size_t>& finishedTweens)
@@ -51,6 +55,15 @@ void Tweener::clearFinishedTweens(const std::vector<size_t>& finishedTweens)
 
         assert(it != m_tweens.end());
         m_tweens.erase(it);
+
+        auto blockit = std::find_if(
+                m_blockingTweenIds.begin()
+                , m_blockingTweenIds.end()
+                , [&] (const auto& in_id)
+                { return in_id == id; });
+
+        if(blockit != m_blockingTweenIds.end())
+            m_blockingTweenIds.erase(blockit);
     }
 }
 

@@ -31,6 +31,9 @@ void TileMarkers::updatePathMarkers(const std::vector<sf::Vector2u>& path)
         m_pathTrail.back().setPosition(sf::Vector2f(pos * 8u) + sf::Vector2f(4.f, 4.f));
         m_pathTrail.back().setOrigin({radius, radius});
     }
+    m_pathTrail.front().setFillColor(sf::Color::Cyan);
+    m_pathTrail.front().setRadius(1.3f);
+    m_pathTrail.back().setOrigin({1.3f, 1.3f});
 }
 
 void TileMarkers::updateHighlightedTiles(const std::vector<sf::Vector2u>& tiles)
