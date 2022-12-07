@@ -153,6 +153,7 @@ if(BUILDTYPE MATCHES DEBUG)
 endif()
 
 if(MSVC)
+    target_link_options(${PROJECT_NAME} PRIVATE "/SUBSYSTEM:WINDOWS" "/MP")
     target_link_libraries(${PROJECT_NAME} PRIVATE sfml-main imgui)
 endif()
 

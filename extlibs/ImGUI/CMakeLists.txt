@@ -16,5 +16,8 @@ add_library(imgui
         imstb_textedit.h
         imstb_truetype.h
         )
-
-target_link_libraries(imgui sfml-graphics sfml-window sfml-audio sfml-system GL)
+if (MSVC)
+  target_link_libraries(imgui sfml-graphics sfml-window sfml-audio sfml-system)
+else ()
+  target_link_libraries(imgui sfml-graphics sfml-window sfml-audio sfml-system GL)
+endif ()
