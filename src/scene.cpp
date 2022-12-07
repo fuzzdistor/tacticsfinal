@@ -7,6 +7,15 @@ void Scene::onKeyPressed(sf::Keyboard::Key){}
 void Scene::onKeyReleased(sf::Keyboard::Key){}
 void Scene::update(sf::Time){}
 
+void Scene::setResetCallback(std::function<void(void)> callback)
+{
+    m_resetScene = callback;
+}
+void Scene::resetScene()
+{
+    m_resetScene();
+}
+
 sf::View& Scene::getView()
 {
     return m_sceneView;

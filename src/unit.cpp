@@ -18,17 +18,20 @@ Unit::Unit(const sf::Texture& texture)
     , m_status(Status::None)
     , m_id()
     , m_playerControlled(false)
+    , m_reportBackDeath(nullptr)
 {
 }
 
-Unit::Unit(const sf::Texture& texture, const std::string& name, const Stats& stats)
+Unit::Unit(const sf::Texture& texture, const std::string& name, const Stats& stats, const std::function<void(uint)>& reportDeath)
     : m_name(name)
     , m_coords()
     , m_position()
     , m_sprite(texture)
     , m_stats(stats)
+    , m_status(Status::None)
     , m_id()
     , m_playerControlled(false)
+    , m_reportBackDeath(reportDeath)
 {
 }
 
@@ -36,6 +39,11 @@ void Unit::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform.translate(m_position);
     target.draw(m_sprite, states);
+}
+
+void Unit::registerDeathReportCallback(const std::function<void(uint)> callback)
+{
+    m_reportBackDeath = callback;
 }
 
 const std::string& Unit::getName() const
@@ -90,6 +98,7 @@ void Unit::markDead()
 {
     m_sprite.setColor(sf::Color::Black);
     m_status = Status::Dead;
+    m_reportBackDeath(m_id);
 }
 
 

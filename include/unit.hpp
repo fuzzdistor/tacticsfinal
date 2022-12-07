@@ -35,10 +35,11 @@ public:
     // TODO  evitar que sean copiables
 
     explicit Unit(const sf::Texture& texture);
-    Unit(const sf::Texture& texture, const std::string& name, const Stats& stats);
+    Unit(const sf::Texture& texture, const std::string& name, const Stats& stats, const std::function<void(uint)>& reportBackDeath);
 
     void setTexture(const sf::Texture& texture);
     constexpr uint getId() const;
+    constexpr void setId(uint id);
     constexpr void setMovement(uint movement);
     constexpr void setAwareness(uint awareness);
     constexpr void setFaction(uint faction);
@@ -51,6 +52,7 @@ public:
     constexpr Stats& getStats();
     constexpr bool isDead() const;
     void markDead();
+    void registerDeathReportCallback(const std::function<void(uint)> callback);
     constexpr bool isPlayerControlled() const;
     constexpr void setPlayerControlled(bool state);
     void setCoordinates(const sf::Vector2u& position);
@@ -71,6 +73,7 @@ private:
     uint m_faction;
     bool m_playerControlled;
     State m_state;
+    std::function<void(uint)> m_reportBackDeath;
 };
 
 constexpr const Stats& Unit::getStats() const
@@ -125,6 +128,11 @@ constexpr uint Unit::getFaction() const
 constexpr bool Unit::isDead() const
 {
     return m_status == Status::Dead;
+}
+
+constexpr void Unit::setId(uint id)
+{
+    m_id = id;
 }
 
 #endif // TF_UNIT_HPP

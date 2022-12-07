@@ -37,7 +37,7 @@ public:
     void moveCharacter(Unit& unit, const sf::Vector2u& position);
     void setCursorPosition(const sf::Vector2u& position);
     void moveCursor(const sf::Vector2u& movement);
-    void advanceTurn(TurnManager::ActionTaken action);
+    void registerBattleResultCallback(std::function<void(bool)> callback);
 
     void accept();
     void cancel();
@@ -46,10 +46,13 @@ public:
 
 private:
     friend class AI;
+    friend void imguiWidget(Board& board);
     friend void imguiWidget(Scene* scene);
 
+    void reportDeath(uint id);
     void draw(sf::RenderTarget& target, sf::RenderStates states) const final;
     void updateTileMarkers();
+    void advanceTurn(TurnManager::ActionTaken action);
 
     Map m_map;
     sf::Sprite m_sprite;
@@ -60,7 +63,9 @@ private:
     Cursor m_cursor;
     AI m_ai;
     Tweener& m_tweener;
+    std::vector<std::pair<uint, uint>> m_aliveUnits;
     CombatManager m_combatManager;
+    std::function<void(bool)> m_reportBattleResults;
     uint m_tileWidth {8};
     uint m_tileHeight {8};
 };

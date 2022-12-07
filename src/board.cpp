@@ -19,6 +19,7 @@ Board::Board(const MapData& data)
     , m_turnManager()
     , m_ai(*this)
     , m_tweener(Tweener::getInstance())
+    , m_aliveUnits()
     , m_combatManager(m_map, m_units)
 {
     m_units.reserve(data.units);
@@ -42,10 +43,13 @@ Board::Board(const MapData& data)
                     ResourcePack::getInstance().textures.get(hash)
                     , data_names[i]
                     , data_stats[i]
+                    , [&](uint id){ reportDeath(id); }
                     );
             unit.setCoordinates(coordinates[i]);
             unit.setPlayerControlled(data_playercontrolled[i]);
             unit.setFaction(faction);
+            unit.setId(static_cast<uint>(i));
+            m_aliveUnits.emplace_back(unit.getId(), data_playercontrolled[i]);
         }
     }
 
@@ -85,14 +89,32 @@ void Board::setEntityPosition(T& entity, const sf::Vector2u& position, Terrain::
         D("attempt failed for some reason");
 }
 
+void Board::reportDeath(uint id)
+{
+    // FIXME cambiar numeros magicos de faccion a enums
+    std::erase_if(m_aliveUnits, [id=id](const auto& pair){ return pair.first == id; });
+    auto it = std::find_if(m_aliveUnits.begin(), m_aliveUnits.end(), [](const auto& pair) { return pair.second == 1u; });
+    if (it == m_aliveUnits.end())
+        m_reportBattleResults(false);
+    auto it2 = std::find_if(m_aliveUnits.begin(), m_aliveUnits.end(), [](const auto& pair) { return pair.second == 2u; });
+    if (it2 == m_aliveUnits.end())
+        m_reportBattleResults(true);
+}
+
+void Board::registerBattleResultCallback(std::function<void(bool)> callback)
+{
+    m_reportBattleResults = callback;
+}
+
 void Board::advanceTurn(TurnManager::ActionTaken action)
 {
-    //
-    auto it = std::find_if(
-            m_units.begin()
-            , m_units.end()
-            , [&](const Unit& unit) { return &unit == m_currentTurn; });
-    m_turnManager.takeCtFromUnit(*it, action);
+    // usar const_cast esta suuuuper mal visto, pero lo estoy usando
+    // bien, para poder tomar de nuevo una referencia a un objeto
+    // que a primeras no es const a traves de un const unit*. Esto
+    // probablemente esconde un design flaw con mi programa, y debería
+    // intentar refactorear el codigo pero por el momento va a
+    // tener que servir. FIXME
+    m_turnManager.takeCtFromUnit(const_cast<Unit&>(*m_currentTurn), action);
 
     m_currentTurn = m_turnManager.getNextUnitAdvance();
     m_map.updateTerrainFaction(m_units, m_currentTurn->getFaction());
@@ -131,9 +153,14 @@ void Board::update(sf::Time)
         m_ai.takeTurn(const_cast<Unit&>(*m_currentTurn));
     }
 
-    Stats s = m_currentTurn->getStats();
+    imguiWidget(*this);
+}
+
+void imguiWidget(Board& board)
+{
+    const Stats& s = board.m_currentTurn->getStats();
     ImGui::Begin("Current Turn");
-    ImGui::Text("Unit: %s", m_currentTurn->getName().c_str());
+    ImGui::Text("Unit: %s", board.m_currentTurn->getName().c_str());
     ImGui::Text("HP: %d/%d", s.healthPoints, s.maxHealthPoints);
     ImGui::Text("MP: %d/%d", s.magicPoints, s.maxMagicPoints);
     ImGui::Text("Lvl/Exp: %d/%d", s.level, s.experiencePoints);
@@ -143,6 +170,19 @@ void Board::update(sf::Time)
     {
     }
     ImGui::EndChild();
+    ImGui::Begin("Info");
+
+    auto it = std::find_if(board.m_units.begin(), board.m_units.end(), [&](const Unit& unit)
+             { return unit.getCoordinates() == board.m_cursor.getCoordinates(); });
+    if (it != board.m_units.end())
+    {
+        const Stats& u = it->getStats();
+        ImGui::Text("Unit: %s", it->getName().c_str());
+        ImGui::Text("HP: %d/%d", u.healthPoints, u.maxHealthPoints);
+        ImGui::Text("MP: %d/%d", u.magicPoints, u.maxMagicPoints);
+        ImGui::Text("Lvl/Exp: %d/%d", u.level, u.experiencePoints);
+    }
+    ImGui::End();
     //
     ImGui::End();
 }
@@ -192,7 +232,7 @@ void Board::accept()
             moveCharacter(character, m_cursor.getCoordinates());
 
             // trata de atacar y avanza el turno acorde
-            if (m_combatManager.attack(character))
+            if (m_combatManager.tryAttack(character))
                 advanceTurn(TurnManager::ActionTaken::MovedAndAction);
             else
                 advanceTurn(TurnManager::ActionTaken::Moved);

@@ -6,6 +6,7 @@
 #include "SFML/System/Time.hpp"
 #include "SFML/Window/Keyboard.hpp"
 #include "SFML/Window/Mouse.hpp"
+#include <functional>
 
 class Scene
 {
@@ -24,12 +25,15 @@ public:
     sf::View getView() const;
     sf::View& getView();
     void setView(const sf::View& view);
+    void setResetCallback(std::function<void(void)> callback);
 
 protected:
     friend void imguiWidget();
+    void resetScene();
 
 private:
     sf::View m_sceneView;
+    std::function<void(void)> m_resetScene;
 };
 
 #endif //  TF_SCENE_HPP

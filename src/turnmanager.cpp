@@ -68,7 +68,8 @@ void TurnManager::advanceOneTick()
 {
     for (auto& proxy : m_units)
     {
-        proxy.advanceCounter();
+        if (proxy.m_unit->getStatus() != Status::Dead)
+            proxy.advanceCounter();
     }
 }
 

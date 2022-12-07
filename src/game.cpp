@@ -14,7 +14,8 @@ Game::Game()
     , m_frameTimer()
 {
     init();
-    resetScene();
+    currentScene = std::make_unique<BattleScene>();
+    currentScene->setResetCallback([&]{ resetScene(); });
 }
 
 void Game::init()

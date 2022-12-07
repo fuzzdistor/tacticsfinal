@@ -15,6 +15,7 @@ BattleScene::BattleScene()
     , m_startText()
     , m_tweener(Tweener::getInstance())
 {
+    m_board.registerBattleResultCallback([&](bool result){ battleResults(result); });
     setView(sf::View(sf::Vector2f(0, 0), sf::Vector2f(1280, 720)));
     m_startText.setFont(ResourcePack::getInstance().fonts.get(fd::hash("Default")));
     m_startText.setCharacterSize(80);
@@ -101,6 +102,22 @@ void BattleScene::onKeyPressed(sf::Keyboard::Key key)
             m_board.cancel();
             break;
         default:;
+    }
+}
+
+void BattleScene::battleResults(bool result)
+{
+    if (result)
+    {
+        D("Victory");
+        resetScene();
+        //playVictory();
+    }
+    else
+    {
+        D("Defeat");
+        resetScene();
+        //playDefeat();
     }
 }
 

@@ -17,7 +17,9 @@ public:
 protected:
     friend void imguiWidget(Scene* scene);
 
+
 private:
+    void battleResults(bool result);
     Board m_board;
     sf::RectangleShape m_screen;
     sf::Text m_startText;

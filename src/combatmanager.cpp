@@ -31,7 +31,7 @@ std::vector<Unit*> CombatManager::getPosibleTargets(const Unit &attacker)
     return targets;
 }
 
-bool CombatManager::attack(const Unit& attacker)
+bool CombatManager::tryAttack(const Unit& attacker)
 {
     return attack(attacker, getPosibleTargets(attacker));
 }
@@ -63,6 +63,11 @@ bool CombatManager::attack(const Unit& attacker, std::vector<Unit*> targets)
 {
     if (targets.empty())
         return false;
+
+    // borro las unidades que esten muertas
+    std::erase_if(targets, [](const Unit* unit)
+            { return unit->isDead(); } );
+
     // busco la unidad con menor hp para atacar
     auto target = std::min_element(targets.begin(), targets.end(), [](const Unit* lhs, const Unit* rhs)
             { return lhs->getStats().healthPoints < rhs->getStats().healthPoints; });

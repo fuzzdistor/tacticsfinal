@@ -8,8 +8,8 @@
 class CombatManager
 {
 public:
-    explicit CombatManager(const Map& map, std::vector<Unit>& units);
-    bool attack(const Unit& attacker);
+    CombatManager(const Map& map, std::vector<Unit>& units);
+    bool tryAttack(const Unit& attacker);
 
 private:
     bool attack(const Unit& attacker, Unit& target);
