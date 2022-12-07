@@ -1,6 +1,7 @@
 #include "ai.hpp"
 #include "board.hpp"
 #include "terrain.hpp"
+#include "turnmanager.hpp"
 #include "utils.hpp"
 
 AI::AI(Board& board)
@@ -56,12 +57,12 @@ void AI::takeTurn(Unit& unit)
         for (auto& position : it->second)
             D("position: " << position);
         m_board.moveCharacter(unit , it->second.at(it->second.size() - distance));
-        m_board.advanceTurn();
+        m_board.advanceTurn(TurnManager::ActionTaken::Moved);
     }
     else
     {
         D(unit.getName() << " did not find a unit to approach");
         D(unit.getName() << " stays in place");
-        m_board.advanceTurn();
+        m_board.advanceTurn(TurnManager::ActionTaken::None);
     }
 }

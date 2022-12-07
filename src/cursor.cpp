@@ -37,7 +37,7 @@ void Cursor::setCoordinates(const sf::Vector2u& coords)
 void Cursor::tweenPosition(const sf::Vector2u& position)
 {
     m_coords = position;
-    Tween tween(&m_position, m_position, sf::Vector2f(m_coords*8u), sf::seconds(0.2f), Easing::QuadEaseOut);
+    Tween tween(&m_position, m_position, sf::Vector2f(m_coords*8u), sf::seconds(0.2f), Easing::Type::QuadEaseOut);
     Tweener::getInstance().createTween([tween = tween](sf::Time dt) mutable
             {
                 tween.update(dt);

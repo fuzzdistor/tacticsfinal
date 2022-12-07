@@ -3,7 +3,9 @@
 
 #include <cmath>
 
-enum class Easing
+namespace Easing
+{
+enum class Type
 {
     Linear,
     Squared,
@@ -43,5 +45,5 @@ inline float smoothstep(float t)
     float v2 = 1.f - (1.f - t) * (1.f - t);
     return std::lerp(v1, v2, t);
 }
-
+}
 #endif // TF_EASINGFUNCTIONS_HPP

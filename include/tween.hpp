@@ -20,9 +20,9 @@ class Tween
 {
 public:
     Tween();
-    Tween(T* propierty, T start, T end, sf::Time time, Easing easing = Easing::Linear);
+    Tween(T* propierty, T start, T end, sf::Time time, Easing::Type easing = Easing::Type::Linear);
 
-    void setTween(T* propierty, T start, T end, sf::Time time, Easing easing = Easing::Linear);
+    void setTween(T* propierty, T start, T end, sf::Time time, Easing::Type easing = Easing::Type::Linear);
 
     void update(sf::Time dt);
     void update(sf::Time dt) requires (std::is_same_v<T, sf::Vector2f>);
@@ -46,7 +46,7 @@ Tween<T>::Tween()
     , m_start()
     , m_end()
     , m_propierty()
-    , m_easingFunction(&linear)
+    , m_easingFunction(&Easing::linear)
     , m_isActive(false)
 {
 }
@@ -57,26 +57,26 @@ bool Tween<T>::isActive() const
     return m_isActive;
 }
 
-inline std::function<float(float)> getEasingFunc(Easing easing)
+inline std::function<float(float)> getEasingFunc(Easing::Type easing)
 {
     switch (easing)
     {
-    case Easing::Linear:
-        return &linear;
-    case Easing::Squared:
-        return &squared;
-    case Easing::SquareRoot:
-        return &squareroot;
-    case Easing::QuadEaseOut:
-        return &quadraticeaseout;
-    case Easing::SmoothStep:
-        return &smoothstep;
+    case Easing::Type::Linear:
+        return &Easing::linear;
+    case Easing::Type::Squared:
+        return &Easing::squared;
+    case Easing::Type::SquareRoot:
+        return &Easing::squareroot;
+    case Easing::Type::QuadEaseOut:
+        return &Easing::quadraticeaseout;
+    case Easing::Type::SmoothStep:
+        return &Easing::smoothstep;
     }
-    return &linear;
+    return &Easing::linear;
 }
 
 template<Tweenable T>
-void Tween<T>::setTween(T* propierty, T start, T end, sf::Time time, Easing easing)
+void Tween<T>::setTween(T* propierty, T start, T end, sf::Time time, Easing::Type easing)
 {
     m_time = time;
     m_start = start;
@@ -88,7 +88,7 @@ void Tween<T>::setTween(T* propierty, T start, T end, sf::Time time, Easing easi
 }
 
 template<Tweenable T>
-Tween<T>::Tween(T* propierty, T start, T end, sf::Time time, Easing easing)
+Tween<T>::Tween(T* propierty, T start, T end, sf::Time time, Easing::Type easing)
     : m_time(time)
     , m_t(sf::Time::Zero)
     , m_start(start)

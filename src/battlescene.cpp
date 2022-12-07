@@ -2,6 +2,7 @@
 #include "SFML/Config.hpp"
 #include "SFML/System/Vector2.hpp"
 #include <algorithm>
+#include "easingfunctions.hpp"
 #include "imgui.h"
 #include "resourcemanager.hpp"
 #include "tween.hpp"
@@ -33,7 +34,7 @@ BattleScene::BattleScene()
                 m_startText.setFillColor(sf::Color(255, 255, 255, sf::Uint8(alpha)));
             }
 
-            twinkle = std::lerp(0, 10, timer.asSeconds()/5.f);
+            twinkle = std::lerp(0, 10, timer.asSeconds()/4.f + 0.5f);
             m_startText.setFillColor(sf::Color(255, 255, 255, sf::Uint8(alpha * (twinkle%2))));
 
             if (timer > sf::seconds(2.f))
@@ -41,7 +42,10 @@ BattleScene::BattleScene()
             m_screen.setFillColor(sf::Color(0, 0, 0, sf::Uint8(alpha)));
             tween.update(dt);
             }
+            else
+            {
             timer += dt;
+            }
 
             return !tween.isActive();
             });

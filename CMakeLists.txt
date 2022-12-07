@@ -44,6 +44,7 @@ add_executable("${CMAKE_PROJECT_NAME}"
     src/astarnode.cpp
     src/battlescene.cpp
     src/board.cpp
+    src/combatmanager.cpp
     src/cursor.cpp
     src/game.cpp
     src/map.cpp
@@ -59,6 +60,7 @@ add_executable("${CMAKE_PROJECT_NAME}"
     include/astarnode.hpp
     include/battlescene.hpp
     include/board.hpp
+    include/combatmanager.hpp
     include/cursor.hpp
     include/easingfunctions.hpp
     include/game.hpp

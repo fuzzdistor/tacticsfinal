@@ -1,3 +1,6 @@
+#ifndef TF_XORSHIFT_HPP
+#define TF_XORSHIFT_HPP
+
 #include <cstdint>
 
 class xorshift {
@@ -56,3 +59,5 @@ bool operator!=(const xorshift &lhs, const xorshift &rhs);
     // Two engines compare as equal if their states are
     // bitwise-identical, i.e. if they would generate the same
     // numbers forever.
+
+#endif // TF_XORSHIFT_HPP

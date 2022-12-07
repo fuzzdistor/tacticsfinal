@@ -19,6 +19,7 @@ Board::Board(const MapData& data)
     , m_turnManager()
     , m_ai(*this)
     , m_tweener(Tweener::getInstance())
+    , m_combatManager(m_map, m_units)
 {
     m_units.reserve(data.units);
     {
@@ -84,13 +85,15 @@ void Board::setEntityPosition(T& entity, const sf::Vector2u& position, Terrain::
         D("attempt failed for some reason");
 }
 
-void Board::advanceTurn()
+void Board::advanceTurn(TurnManager::ActionTaken action)
 {
+    //
     auto it = std::find_if(
             m_units.begin()
             , m_units.end()
             , [&](const Unit& unit) { return &unit == m_currentTurn; });
-    m_turnManager.takeCtFromUnit(*it, TurnManager::ActionTaken::Moved);
+    m_turnManager.takeCtFromUnit(*it, action);
+
     m_currentTurn = m_turnManager.getNextUnitAdvance();
     m_map.updateTerrainFaction(m_units, m_currentTurn->getFaction());
     updateTileMarkers();
@@ -118,12 +121,13 @@ void Board::update(sf::Time)
 {
     if (!m_tweener.isActive() && !m_currentTurn->isPlayerControlled())
     {
-        auto it = std::find_if(
-                m_units.begin()
-                , m_units.end()
-                , [&](const Unit& unit) { return &unit == m_currentTurn; });
-
-        m_ai.takeTurn(*it);
+        // usar const_cast esta suuuuper mal visto, pero lo estoy usando
+        // bien, para poder tomar de nuevo una referencia a un objeto
+        // que a primeras no es const a traves de un const unit*. Esto
+        // probablemente esconde un design flaw con mi programa, y debería
+        // intentar refactorear el codigo pero por el momento va a
+        // tener que servir. FIXME
+        m_ai.takeTurn(const_cast<Unit&>(*m_currentTurn));
     }
 
     Stats s = m_currentTurn->getStats();
@@ -132,11 +136,13 @@ void Board::update(sf::Time)
     ImGui::Text("HP: %d/%d", s.healthPoints, s.maxHealthPoints);
     ImGui::Text("MP: %d/%d", s.magicPoints, s.maxMagicPoints);
     ImGui::Text("Lvl/Exp: %d/%d", s.level, s.experiencePoints);
+    // TODO GUI
     ImGui::BeginChild("ASD");
     if (ImGui::Button("LABEL", ImVec2(100, 20)))
     {
     }
     ImGui::EndChild();
+    //
     ImGui::End();
 }
 
@@ -171,15 +177,24 @@ void Board::accept()
 {
     if (!m_tweener.isActive() && m_currentTurn->isPlayerControlled())
     {
+        // si las coordenadas son válidas avanza sino espera una coordenada valida
         if (auto path = m_map.getPath(m_currentTurn->getCoordinates(), m_cursor.getCoordinates(), m_currentTurn->getStats().movement);
                 path.first == AStar::PathType::Valid)
         {
-            auto it = std::find_if(
-                    m_units.begin()
-                    , m_units.end()
-                    , [&](const Unit& unit) { return &unit == m_currentTurn; });
-            moveCharacter(*it, m_cursor.getCoordinates());
-            advanceTurn();
+            // usar const_cast esta suuuuper mal visto, pero lo estoy usando
+            // bien, para poder tomar de nuevo una referencia a un objeto
+            // que a primeras no es const a traves de un const unit*. Esto
+            // probablemente esconde un design flaw con mi programa, y debería
+            // intentar refactorear el codigo pero por el momento va a
+            // tener que servir. FIXME
+            auto& character = const_cast<Unit&>(*m_currentTurn);
+            moveCharacter(character, m_cursor.getCoordinates());
+
+            // trata de atacar y avanza el turno acorde
+            if (m_combatManager.attack(character))
+                advanceTurn(TurnManager::ActionTaken::MovedAndAction);
+            else
+                advanceTurn(TurnManager::ActionTaken::Moved);
         }
     }
 }

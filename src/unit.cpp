@@ -74,7 +74,7 @@ void Unit::tweenPath(std::vector<sf::Vector2u>& path)
     if (path.size() == 0)
         return;
 
-    Tween pathTween(&m_position, m_position, sf::Vector2f(path.back()*8u), sf::seconds(0.2f), Easing::SmoothStep);
+    Tween pathTween(&m_position, m_position, sf::Vector2f(path.back()*8u), sf::seconds(0.2f), Easing::Type::SmoothStep);
     m_coords = path.front();
     path.pop_back();
     Tweener::getInstance().createTween([path = path, tween = pathTween, this](sf::Time dt) mutable

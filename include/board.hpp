@@ -9,6 +9,7 @@
 #include "SFML/System/Time.hpp"
 #include "SFML/System/Vector2.hpp"
 #include "ai.hpp"
+#include "combatmanager.hpp"
 #include "cursor.hpp"
 #include "map.hpp"
 #include "terrain.hpp"
@@ -36,7 +37,7 @@ public:
     void moveCharacter(Unit& unit, const sf::Vector2u& position);
     void setCursorPosition(const sf::Vector2u& position);
     void moveCursor(const sf::Vector2u& movement);
-    void advanceTurn();
+    void advanceTurn(TurnManager::ActionTaken action);
 
     void accept();
     void cancel();
@@ -59,6 +60,7 @@ private:
     Cursor m_cursor;
     AI m_ai;
     Tweener& m_tweener;
+    CombatManager m_combatManager;
     uint m_tileWidth {8};
     uint m_tileHeight {8};
 };

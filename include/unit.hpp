@@ -47,6 +47,7 @@ public:
     sf::Vector2u getCoordinates() const;
     Status getStatus() const;
     constexpr const Stats& getStats() const;
+    constexpr Stats& getStats();
     constexpr bool isPlayerControlled() const;
     constexpr void setPlayerControlled(bool state);
     void setCoordinates(const sf::Vector2u& position);
@@ -70,6 +71,11 @@ private:
 };
 
 constexpr const Stats& Unit::getStats() const
+{
+    return m_stats;
+}
+
+constexpr Stats& Unit::getStats()
 {
     return m_stats;
 }
