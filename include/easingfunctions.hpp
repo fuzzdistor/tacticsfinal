@@ -24,7 +24,12 @@ inline float squared(float t)
 
 inline float squareroot(float t)
 {
+#ifdef __GNUC__
+    return sqrtf(t);
+#else
     return std::sqrtf(t);
+#endif
+
 }
 
 inline float quadraticeaseout(float t)
