@@ -108,9 +108,12 @@ void BattleScene::update(sf::Time dt)
 {
     m_board.update(dt);
     m_tweener.update(dt);
+#ifndef NDEBUG
     imguiWidget(this);
+#endif
 }
 
+#ifndef NDEBUG
 void imguiWidget(Scene* scene)
 {
     auto battlescene = static_cast<BattleScene*>(scene);
@@ -126,4 +129,4 @@ void imguiWidget(Scene* scene)
     ImGui::Text("View size is %2.2f, %2.2f", static_cast<double>(scene->getView().getSize().x), static_cast<double>(scene->getView().getSize().y));
     ImGui::End();
 }
-
+#endif

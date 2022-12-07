@@ -86,6 +86,13 @@ void Unit::tweenPath(std::vector<sf::Vector2u>& path)
             });
 }
 
+void Unit::markDead()
+{
+    m_sprite.setColor(sf::Color::Black);
+    m_status = Status::Dead;
+}
+
+
 void Unit::setCoordinates(const sf::Vector2u& position)
 {
     m_position = sf::Vector2f(position*8u);

@@ -17,6 +17,7 @@ enum class Status
     Slow,
     Haste,
     None,
+    Dead,
 };
 
 class Unit : public sf::Drawable
@@ -48,6 +49,8 @@ public:
     Status getStatus() const;
     constexpr const Stats& getStats() const;
     constexpr Stats& getStats();
+    constexpr bool isDead() const;
+    void markDead();
     constexpr bool isPlayerControlled() const;
     constexpr void setPlayerControlled(bool state);
     void setCoordinates(const sf::Vector2u& position);
@@ -117,6 +120,11 @@ constexpr void Unit::setFaction(uint faction)
 constexpr uint Unit::getFaction() const
 {
     return m_faction;
+}
+
+constexpr bool Unit::isDead() const
+{
+    return m_status == Status::Dead;
 }
 
 #endif // TF_UNIT_HPP

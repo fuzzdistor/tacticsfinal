@@ -102,6 +102,7 @@ void Board::advanceTurn(TurnManager::ActionTaken action)
             { t+=dt; return t > sf::seconds(1.f); });
 }
 
+
 void Board::moveCharacter(Unit& unit, const sf::Vector2u& position)
 {
     setEntityPosition(unit, position);

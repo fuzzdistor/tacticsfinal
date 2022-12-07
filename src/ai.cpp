@@ -57,7 +57,10 @@ void AI::takeTurn(Unit& unit)
         for (auto& position : it->second)
             D("position: " << position);
         m_board.moveCharacter(unit , it->second.at(it->second.size() - distance));
-        m_board.advanceTurn(TurnManager::ActionTaken::Moved);
+        if (m_board.m_combatManager.attack(unit))
+            m_board.advanceTurn(TurnManager::ActionTaken::MovedAndAction);
+        else
+            m_board.advanceTurn(TurnManager::ActionTaken::Moved);
     }
     else
     {

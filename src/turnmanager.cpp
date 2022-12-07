@@ -100,6 +100,12 @@ void TurnManager::computeUnitsTurnVariables()
 
     for (auto& proxy : m_units)
     {
+        if (proxy.m_unit->isDead())
+        {
+            proxy.counter = 0;
+            proxy.reserve = 0;
+            continue;
+        }
         proxy.counter = std::min(proxy.counter - newReserve, 1000u);
         proxy.reserve = newReserve;
     }

@@ -40,7 +40,18 @@ bool CombatManager::attack(const Unit& attacker, Unit& target)
 {
     if (rng()%16 != 0)
     {
-        target.getStats().healthPoints -= attacker.getStats().weaponAttack - target.getStats().weaponDefense;
+        uint attackerPower = attacker.getStats().weaponAttack;
+        uint targetDefense = target.getStats().weaponDefense;
+        uint& targetHealth = target.getStats().healthPoints;
+        if (attackerPower - targetDefense >= targetHealth)
+        {
+            targetHealth = 0;
+            target.markDead();
+        }
+        else
+        {
+            targetHealth -= attackerPower - targetDefense;
+        }
         // TODO Trigger attack animation
         return true;
     }
