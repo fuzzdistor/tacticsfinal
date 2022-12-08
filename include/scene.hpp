@@ -26,14 +26,17 @@ public:
     sf::View& getView();
     void setView(const sf::View& view);
     void setResetCallback(std::function<void(void)> callback);
+    void setQuitCallback(std::function<void(void)> callback);
 
 protected:
     friend void imguiWidget();
     void resetScene();
+    void quit();
 
 private:
     sf::View m_sceneView;
     std::function<void(void)> m_resetScene;
+    std::function<void(void)> m_quitProgram;
 };
 
 #endif //  TF_SCENE_HPP

@@ -22,7 +22,7 @@ Board::Board(const MapData& data)
     , m_aliveUnits()
     , m_combatManager(m_map, m_units)
 {
-    m_units.reserve(data.units);
+    m_units.reserve(10);
     {
         std::array<sf::Vector2u, data_units> coordinates =
         {
@@ -92,13 +92,23 @@ void Board::setEntityPosition(T& entity, const sf::Vector2u& position, Terrain::
 void Board::reportDeath(uint id)
 {
     // FIXME cambiar numeros magicos de faccion a enums
-    std::erase_if(m_aliveUnits, [id=id](const auto& pair){ return pair.first == id; });
-    auto it = std::find_if(m_aliveUnits.begin(), m_aliveUnits.end(), [](const auto& pair) { return pair.second == 1u; });
-    if (it == m_aliveUnits.end())
-        m_reportBattleResults(false);
-    auto it2 = std::find_if(m_aliveUnits.begin(), m_aliveUnits.end(), [](const auto& pair) { return pair.second == 2u; });
-    if (it2 == m_aliveUnits.end())
-        m_reportBattleResults(true);
+    std::erase_if(m_aliveUnits, [id = id](const auto& pair) { return pair.first == id; });
+    uint allied = 0;
+    uint enemies = 0;
+    for (auto& unit : m_aliveUnits)
+    {
+        unit.second == 1 ? allied++ : enemies++;
+    }
+    if (enemies == 0)
+    {
+        m_isOver = true;
+        m_win = true;
+    }
+    if (allied == 0)
+    {
+        m_isOver = true;
+        m_win = false;
+    }
 }
 
 void Board::registerBattleResultCallback(std::function<void(bool)> callback)
@@ -114,7 +124,10 @@ void Board::advanceTurn(TurnManager::ActionTaken action)
     // probablemente esconde un design flaw con mi programa, y debería
     // intentar refactorear el codigo pero por el momento va a
     // tener que servir. FIXME
-    m_turnManager.takeCtFromUnit(const_cast<Unit&>(*m_currentTurn), action);
+	auto character = std::find_if(m_units.begin(), m_units.end(), [&](const Unit& unit)
+		{ return &unit == m_currentTurn; });
+    //m_turnManager.takeCtFromUnit(const_cast<Unit&>(*m_currentTurn), action);
+    m_turnManager.takeCtFromUnit(*character, action);
 
     m_currentTurn = m_turnManager.getNextUnitAdvance();
     m_map.updateTerrainFaction(m_units, m_currentTurn->getFaction());
@@ -150,7 +163,11 @@ void Board::update(sf::Time)
         // probablemente esconde un design flaw con mi programa, y debería
         // intentar refactorear el codigo pero por el momento va a
         // tener que servir. FIXME
-        m_ai.takeTurn(const_cast<Unit&>(*m_currentTurn));
+        auto character = std::find_if(m_units.begin(), m_units.end(), [&](const Unit& unit)
+                { return &unit == m_currentTurn; });
+
+        //m_ai.takeTurn(const_cast<Unit&>(*m_currentTurn));
+        m_ai.takeTurn(*character);
     }
 
     imguiWidget(*this);
@@ -165,8 +182,19 @@ void imguiWidget(Board& board)
     ImGui::Text("MP: %d/%d", s.magicPoints, s.maxMagicPoints);
     ImGui::Text("Lvl/Exp: %d/%d", s.level, s.experiencePoints);
     // TODO GUI
-    ImGui::EndChild();
+    ImGui::End();
     ImGui::Begin("Info");
+
+    if (board.m_isOver)
+    {
+        ImGui::Begin("BATTLE OVER!");
+		ImGui::Text("Do you wish to restart or quit?");
+        if (ImGui::Button("Restart"))
+            board.m_reportBattleResults(true);
+        if (ImGui::Button("Quit"))
+            board.m_reportBattleResults(false);
+        ImGui::End();
+    }
 
     auto it = std::find_if(board.m_units.begin(), board.m_units.end(), [&](const Unit& unit)
              { return unit.getCoordinates() == board.m_cursor.getCoordinates(); });
@@ -178,8 +206,6 @@ void imguiWidget(Board& board)
         ImGui::Text("MP: %d/%d", u.magicPoints, u.maxMagicPoints);
         ImGui::Text("Lvl/Exp: %d/%d", u.level, u.experiencePoints);
     }
-    ImGui::End();
-    //
     ImGui::End();
 }
 
@@ -224,11 +250,12 @@ void Board::accept()
             // probablemente esconde un design flaw con mi programa, y debería
             // intentar refactorear el codigo pero por el momento va a
             // tener que servir. FIXME
-            auto& character = const_cast<Unit&>(*m_currentTurn);
-            moveCharacter(character, m_cursor.getCoordinates());
+            auto character = std::find_if(m_units.begin(), m_units.end(), [&](const Unit& unit)
+                { return &unit == m_currentTurn; });
+            moveCharacter(*character, m_cursor.getCoordinates());
 
             // trata de atacar y avanza el turno acorde
-            if (m_combatManager.tryAttack(character))
+            if (m_combatManager.tryAttack(*character))
                 advanceTurn(TurnManager::ActionTaken::MovedAndAction);
             else
                 advanceTurn(TurnManager::ActionTaken::Moved);

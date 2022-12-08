@@ -15,7 +15,8 @@ Game::Game()
 {
     init();
     currentScene = std::make_unique<BattleScene>();
-    currentScene->setResetCallback([&]{ resetScene(); });
+    currentScene->setResetCallback([&]{ requestReset(); });
+    currentScene->setQuitCallback([&]{ closeRequested = true; });
 }
 
 void Game::init()
@@ -35,17 +36,25 @@ void Game::update()
     sf::Time frameTime = m_frameTimer.restart();
     ImGui::SFML::Update(window, frameTime);
     currentScene->update(frameTime);
+    if (resetRequested)
+        resetScene();
+}
+
+void Game::requestReset()
+{
+    resetRequested = true;
 }
 
 void Game::resetScene()
 {
     currentScene = std::make_unique<BattleScene>();
+    resetRequested = false;
 }
 
 void Game::run()
 {
     m_frameTimer.restart();
-    while(window.isOpen())
+    while(window.isOpen() && !closeRequested)
     {
         handleEvents();
         update();

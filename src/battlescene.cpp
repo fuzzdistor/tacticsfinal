@@ -113,15 +113,11 @@ void BattleScene::battleResults(bool result)
 {
     if (result)
     {
-        D("Victory");
         resetScene();
-        //playVictory();
     }
     else
     {
-        D("Defeat");
-        resetScene();
-        //playDefeat();
+        quit();
     }
 }
 

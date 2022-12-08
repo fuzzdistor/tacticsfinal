@@ -61,12 +61,12 @@ bool CombatManager::attack(const Unit& attacker, Unit& target)
 
 bool CombatManager::attack(const Unit& attacker, std::vector<Unit*> targets)
 {
-    if (targets.empty())
-        return false;
-
     // borro las unidades que esten muertas
     std::erase_if(targets, [](const Unit* unit)
             { return unit->isDead(); } );
+
+    if (targets.empty())
+        return false;
 
     // busco la unidad con menor hp para atacar
     auto target = std::min_element(targets.begin(), targets.end(), [](const Unit* lhs, const Unit* rhs)

@@ -11,9 +11,20 @@ void Scene::setResetCallback(std::function<void(void)> callback)
 {
     m_resetScene = callback;
 }
+
+void Scene::setQuitCallback(std::function<void(void)> callback)
+{
+    m_quitProgram = callback;
+}
+
 void Scene::resetScene()
 {
     m_resetScene();
+}
+
+void Scene::quit()
+{
+    m_quitProgram();
 }
 
 sf::View& Scene::getView()

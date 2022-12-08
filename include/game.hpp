@@ -30,12 +30,15 @@ private:
     void update();
     void onWindowResized(unsigned int width, unsigned int height);
     void resetScene();
+    void requestReset();
 
     std::unique_ptr<Scene> currentScene;
     sf::RenderWindow window { VIDEOMODE, WINDOW_TITLE };
     sf::View defaultView;
     sf::Clock m_frameTimer;
     bool isFullscreen { false };
+    bool resetRequested { false };
+    bool closeRequested { false };
 };
 
 #endif // TF_GAME_HPP

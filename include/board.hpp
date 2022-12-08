@@ -68,6 +68,8 @@ private:
     std::function<void(bool)> m_reportBattleResults;
     uint m_tileWidth {8};
     uint m_tileHeight {8};
+    bool m_isOver = false;
+    bool m_win = false;
 };
 
 #endif // TF_BOARD_HPP
