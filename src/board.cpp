@@ -26,14 +26,14 @@ Board::Board(const MapData& data)
     {
         std::array<sf::Vector2u, data_units> coordinates =
         {
-            sf::Vector2u(11, 8),
-            sf::Vector2u(10, 8),
-            sf::Vector2u(9, 8),
-            sf::Vector2u(8, 8),
-            sf::Vector2u(3, 0),
-            sf::Vector2u(2, 0),
-            sf::Vector2u(1, 0),
-            sf::Vector2u(0, 0),
+            sf::Vector2u(10, 3),
+            sf::Vector2u(9, 4),
+            sf::Vector2u(9, 5),
+            sf::Vector2u(9, 6),
+            sf::Vector2u(5, 1),
+            sf::Vector2u(2, 3),
+            sf::Vector2u(2, 5),
+            sf::Vector2u(2, 8),
         };
         for (size_t i = 0; i < data_units; i++)
         {
@@ -165,10 +165,6 @@ void imguiWidget(Board& board)
     ImGui::Text("MP: %d/%d", s.magicPoints, s.maxMagicPoints);
     ImGui::Text("Lvl/Exp: %d/%d", s.level, s.experiencePoints);
     // TODO GUI
-    ImGui::BeginChild("ASD");
-    if (ImGui::Button("LABEL", ImVec2(100, 20)))
-    {
-    }
     ImGui::EndChild();
     ImGui::Begin("Info");
 

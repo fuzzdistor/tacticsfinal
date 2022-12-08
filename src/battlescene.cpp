@@ -56,7 +56,9 @@ void BattleScene::draw(sf::RenderTarget &target,
                        sf::RenderStates states) const
 {
     states.transform.scale({ 8.f, 8.f });
-    target.setView(getView());
+    auto view = getView();
+    view.setCenter(view.getSize() / 3.f);
+    target.setView(view);
     target.draw(m_board, states);
     target.setView(target.getDefaultView());
     target.draw(m_screen);
@@ -74,9 +76,11 @@ void BattleScene::onMousePressed(sf::Mouse::Button button, const sf::Vector2f&)
 
 void BattleScene::onMouseMoved(sf::Vector2f movement)
 {
+/* FIXME
     movement = getView().getTransform().transformPoint(movement);
     movement.y = -movement.y;
     m_board.setCursorPosition(sf::Vector2u(movement));
+*/
 }
 
 void BattleScene::onKeyPressed(sf::Keyboard::Key key)
@@ -125,16 +129,18 @@ void BattleScene::update(sf::Time dt)
 {
     m_board.update(dt);
     m_tweener.update(dt);
-#ifndef NDEBUG
     imguiWidget(this);
-#endif
 }
 
-#ifndef NDEBUG
 void imguiWidget(Scene* scene)
 {
     auto battlescene = static_cast<BattleScene*>(scene);
     // ImGui::ShowDemoWindow();
+    ImGui::Begin("Instructions");
+    ImGui::Text("Use WASD to move the cursor\nPress J to move a unit\nUnits autoattack if they are\nnear an enemy.");
+
+    ImGui::End();
+#ifndef NDEBUG
     ImGui::Begin("TurnManager");
     auto highestCtUnit = battlescene->m_board.m_turnManager.getHighestCtUnit();
     ImGui::End();
@@ -145,5 +151,5 @@ void imguiWidget(Scene* scene)
     ImGui::Text("View center is %2.2f, %2.2f", static_cast<double>(scene->getView().getCenter().x), static_cast<double>(scene->getView().getCenter().y));
     ImGui::Text("View size is %2.2f, %2.2f", static_cast<double>(scene->getView().getSize().x), static_cast<double>(scene->getView().getSize().y));
     ImGui::End();
-}
 #endif
+}
