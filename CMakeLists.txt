@@ -114,7 +114,7 @@ set(COMMON_LIBARARIES_STATIC
     ogg
 )
 
-if (NOT SFML_BUILD_STATIC)
+if (NOT MSVC)
   set(SFML_DEBUG_LIBRARIES
     sfml-graphics-d
     sfml-window-d
@@ -131,18 +131,10 @@ if (NOT SFML_BUILD_STATIC)
 else ()
 
   set(SFML_DEBUG_LIBRARIES
-    sfml-graphics-s-d
-    sfml-window-s-d
-    sfml-system-s-d
-    sfml-audio-s-d
     ${COMMON_LIBRARIES_STATIC}
   )
 
   set(SFML_LIBRARIES
-    sfml-graphics-s
-    sfml-window-s
-    sfml-system-s
-    sfml-audio-s
     ${COMMON_LIBRARIES_STATIC}
   )
 endif()
@@ -155,7 +147,7 @@ if(BUILDTYPE MATCHES DEBUG)
 endif()
 
 if(MSVC)
-    target_link_options(${PROJECT_NAME} PRIVATE "/SUBSYSTEM:WINDOWS" "/MP")
+    target_link_options(${PROJECT_NAME} PRIVATE "/SUBSYSTEM:WINDOWS")
     target_link_libraries(${PROJECT_NAME} PRIVATE sfml-main imgui)
 endif()
 
