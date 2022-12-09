@@ -24,4 +24,6 @@ git submodule update
 cmake .
 ```
 
-Luego de esto todo debería estar listo. Si hay problemas por favor contactarme.
+Luego de esto, si todo salió bien, debería estar listo el archivo `TACTICSFINAL.sln` que puede ser abierto con Visual Studio para compilar.
+
+Si hay problemas por favor contactarme!

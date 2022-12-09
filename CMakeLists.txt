@@ -147,6 +147,7 @@ if(BUILDTYPE MATCHES DEBUG)
 endif()
 
 if(MSVC)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
     target_link_options(${PROJECT_NAME} PRIVATE "/SUBSYSTEM:WINDOWS")
     target_link_libraries(${PROJECT_NAME} PRIVATE sfml-main imgui)
 endif()
