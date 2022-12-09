@@ -21,7 +21,7 @@ git submodule update
 - Despues de esto usando CMake generamos el proyecto de Visual Studio
 
 ```
-CMake .
+cmake .
 ```
 
 Luego de esto todo debería estar listo. Si hay problemas por favor contactarme.
